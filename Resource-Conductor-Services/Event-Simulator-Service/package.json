@@ -1,5 +1,5 @@
 {
-  "name"    : "event-simulator",
+  "name"    : "event-simulator-service",
   "version" : "0.0.1",
   "private" : true,
   "scripts" : {

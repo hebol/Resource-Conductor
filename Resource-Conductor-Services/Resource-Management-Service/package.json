@@ -1,5 +1,5 @@
 {
-  "name"    : "resource-simulator",
+  "name"    : "resource-manager-service",
   "version" : "0.0.1",
   "private" : true,
   "scripts" : {
