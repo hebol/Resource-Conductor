@@ -1,0 +1,90 @@
+    =================================================================================
+[ ] RESOURCE-CONDUCTOR-CLIENT (MAP VIEW)
+    =================================================================================
+    [ ] Construct a user interface that uses google maps
+    [ ] Create/find appropriate symbols for:
+        [ ] Ambulance that also shows its state (free, occupied)
+        [ ] Hospital
+        [ ] Event/accident (with four different levels/priorities
+        [ ] Home of patient
+    [ ] Make it possible to add symbols to the map
+    [ ] Access: RESOURCE-MANAGEMENT-SERVICE->symbolFor(...) to ask for the
+        appropriate symbols given an event or maybe id/type.
+    [ ] Subscribe to: TIME-SERVICE->subscribe() and show current time as an overlay
+        on the map
+    [ ] Subscribe to: EVENT-SIMULATOR-SERVICE-subscribe() to get events that shall
+        be presented on the map using the symbols from RESOURCE-MANAGEMENT-SERVICE
+
+    QUESTION: Should the event area be hard-coded or does the resource manager
+              provide a bounding box?
+
+    =================================================================================
+[ ] RESOURCE-CONDUCTOR-CLIENT (RESOURCE MANAGEMENT VIEW)
+    =================================================================================
+    [ ] Construct a user interface to link an event to a resource using
+        RESOURCE-MANAGEMENT-SERVICE->createMission(event-id, resource-id)
+    [ ] Create a list of active missions that shows the status of each
+
+
+    =================================================================================
+[ ] RESOURCE-CONDUCTOR-CLIENT (REPORT VIEW)
+    =================================================================================
+    [ ] Subscribe to: TIME-SERVICE->subscribe() to get events and add them to an
+        event table.
+    [ ] OPTIONAL: Create filters for the table to view only certain events
+    [ ] OPTIONAL: Create table sorting
+
+
+    =================================================================================
+[ ] RESOURCE-CONDUCTOR-CLIENT (TIME VIEW)
+    =================================================================================
+    [ ] Construct a user interface for accessing the time functions
+        [ ] Play using TIME-SERVICE->play()
+        [ ] Pause using TIME-SERVICE->pause()
+        [ ] Set Time-step using TIME-SERVICE->setTimeMultiplier(...)
+        [ ] Set time using TIME-SERVICE->setTime(...)
+
+
+    =================================================================================
+[ ] EVENT-SIMULATOR-SERVICE
+    =================================================================================
+    [ ] Parse event file (JSON) into discrete events and decide on event format
+    [ ] Provide EVENT-SIMULATOR-SERVICE->subscribe() that accepts subscribers and
+        sends events to clients at the determined times.
+    [ ] Subscribe to: TIME-SERVICE->subscribe()
+
+
+    =================================================================================
+[ ] RESOURCE-MANAGEMENT-SERVICE
+    =================================================================================
+    [ ] Make it possible to parse a resource file (JSON) and decide on resource
+        format.
+    [ ] Provide: RESOURCE-MANAGEMENT-SERVICE->symbolFor(...) service to provide
+        appropriate symbols for events/locations/resources.
+    [ ] Subscribe to: TIME-SERVICE->subscribe()
+    [ ] Provide: RESOURCE-MANAGEMENT-SERVICE->createMission(event-id, resource-id)
+        that links a resource to an event.
+
+
+    =================================================================================
+[ ] SERVICE-REGISTRY
+    =================================================================================
+    [ ] Provide: SERVICE-REGISTRY->register(<service>) to let services register
+        themselves.
+    [ ] Provide: SERVICE-REGISTRY->subscribe() to be able to subscribe to service
+        changes (added/removed/failures/etc)
+    [ ] Provide: SERVICE-REGISTRY->lookup(<service id>) to get access information to
+        a specific service.
+
+
+    =================================================================================
+[ ] TIME-SERVICE
+    =================================================================================
+    [ ] Provide: TIME-SERVICE->subscribe() to let subscribers get time updates
+    [ ] Provide: TIME-SERVICE->play() start time simulation
+    [ ] Provide: TIME-SERVICE->pause() pause time simulation
+    [ ] Provide: TIME-SERVICE->reset() reset time to initial state (last setTime())
+    [ ] Provide: TIME-SERVICE->setTime(<time>) to set new actual time
+    [ ] Provide: TIME-SERVICE->setTimeMultiplier(<multiplier>) to increase/decrease
+        simulated time progression.
+
