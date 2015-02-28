@@ -9,6 +9,8 @@ io.on('connection', function(socket) {
     console.log('connecting:', socket.id);
     subscribers.push(socket);
 
+    socket.emit('time', currentTime);
+
     socket.on('setTime', function(time) {
         currentTime = time;
         updateTime(subscribers);
