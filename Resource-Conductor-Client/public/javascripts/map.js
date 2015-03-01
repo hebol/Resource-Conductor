@@ -1,10 +1,6 @@
 var map;
 var socket;
 
-function padTime(text) {
-    return ("00" + text).slice(-2);
-}
-
 $(document).ready(function() {
     var mapOptions = {
         zoom:           13,
@@ -34,6 +30,7 @@ $(document).ready(function() {
 
     socket.on('time', function (data) {
         var date = new Date(data);
-        $("#time").html(padTime(date.getHours()) + ':' + padTime(date.getMinutes()) + ':' + padTime(date.getSeconds()));
+        $("#clock").html(dateUtil.getTime(date));
+        $("#day").html(dateUtil.getDate(date));
     });
 });

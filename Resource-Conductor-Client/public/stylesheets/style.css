@@ -13,14 +13,22 @@ body {
     z-index: 0;
 }
 
-#time {
+#date {
     position:   absolute;
     right:      20px;
     top:        10px;
-    font-size:  26px;
     z-index:    100;
     background: #000;
     color:      #fff;
     padding:    5px 3px 1px 3px;
 }
 
+
+#clock {
+    font-size:  26px;
+}
+
+#day{
+    font-size:  12px;
+    text-align: center;
+}
