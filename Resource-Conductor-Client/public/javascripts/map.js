@@ -1,6 +1,10 @@
 var map;
 var socket;
 
+function padTime(text) {
+    return ("00" + text).slice(-2);
+}
+
 $(document).ready(function() {
     var mapOptions = {
         zoom:           13,
@@ -27,7 +31,9 @@ $(document).ready(function() {
     map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
 
     socket = io.connect('http://localhost:7133');
+
     socket.on('time', function (data) {
-        console.log('TIME:', data);
+        var date = new Date(data);
+        $("#time").html(padTime(date.getHours()) + ':' + padTime(date.getMinutes()) + ':' + padTime(date.getSeconds()));
     });
 });

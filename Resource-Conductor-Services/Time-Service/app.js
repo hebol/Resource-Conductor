@@ -2,14 +2,16 @@ var serverPort = 7133;
 var io         = require('socket.io')();
 
 var subscribers = [];
-var currentTime = Date.now();
+var currentTime = function() {
+    return Date.now();
+}
 
 
 io.on('connection', function(socket) {
     console.log('connecting:', socket.id);
     subscribers.push(socket);
 
-    socket.emit('time', currentTime);
+    socket.emit('time', currentTime());
 
     socket.on('setTime', function(time) {
         currentTime = time;
@@ -22,5 +24,13 @@ io.on('connection', function(socket) {
     });
 });
 
+
+function update() {
+    subscribers.forEach(function(socket) {
+        socket.emit('time', currentTime());
+    });
+}
+
 console.log("Has started time server on port", serverPort);
 io.listen(serverPort);
+setInterval(update, 1000);
