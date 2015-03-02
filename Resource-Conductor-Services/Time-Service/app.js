@@ -18,14 +18,7 @@ io.on('connection', function(socket) {
     socket.on('stopTime', stopTimeFunction);
 });
 
-var startTimeFunction = function() {
-    if (!timeout) {
-        timeout = setInterval(tick, 1000);
-        startTime = new Date();
-        timeReference = timeReference || startTime;
-        console.log("startTime", startTime, "=>", timeReference, "(", timeReference.getTime(), ")");
-    }
-};
+    socket.emit('time', currentTime);
 
 var stopTimeFunction = function() {
     if (timeout) {

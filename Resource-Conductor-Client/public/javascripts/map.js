@@ -29,7 +29,9 @@ $(document).ready(function() {
     registerConsumer('time-service', function(service){
         socket = io.connect(service.url);
         socket.on('time', function (data) {
-            console.log('TIME:', data);
+            var date = new Date(data);
+            $("#clock").html(dateUtil.getTime(date));
+            $("#day").html(dateUtil.getDate(date));
         });
     });
 });
