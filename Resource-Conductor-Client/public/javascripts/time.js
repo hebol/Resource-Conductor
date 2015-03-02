@@ -41,14 +41,14 @@ var stopTime = function() {
 
 $(document).ready(function() {
     $speed = $('#speedOptions');
-    var options = [0.5, 1, 5, 10, 100];
+    var options = [0.5, 1, 6, 10, 60, 300];
     options.forEach(function(value){ $speed.append('<option value="' + value + '">' + value + '</value>');});
     $speed.val(1);
     $speed.change(setNewSpeed);
 
     registerConsumer('time-service', function(service) {
         socket = io.connect(service.url);
-        socket.on('time', function (data) {
+        socket.on('time', function (data, type) {
             var date = new Date(data);
             $("#clock").html(dateUtil.getTime(date));
             $("#day").html(dateUtil.getDate(date));

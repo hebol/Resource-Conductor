@@ -1,53 +1,36 @@
-var serverPort = 1234;
-var io         = require('socket.io')();
+process.title = 'event-system';
 
-var serviceList = {};
+var io = require('socket.io')(),
+    config = require('../Common/js/configService.js');
 
-var sizeObject = function(obj) {
-    var size = 0;
-    var key;
-    for (key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            size++;
-        }
+var port = io.listen(0).httpServer.address().port;
+
+console.log("Has started server on port", port);
+
+var consumer = require('../Common/js/serviceConsumer')('time-service', process.title,
+    {
+        'time': processTimeEvent
     }
-    return size;
-};
+);
+
+var lastTime;
+var eventList = [];
+
+function processEvents(fromTime, toTime) {
+    var events = eventList.filter(function(anEvent) {return anEvent.time.getTime() > fromTime.getTime() && anEvent.time.getTime() <= toTime.getTime()});
+
+    events.forEach(function(anEvent) {io.sockets.emit('event', anEvent);});
+}
+
+function processTimeEvent(time, type) {
+    if (type == 'tick' && lastTime) {
+        processEvents(lastTime, time);
+    }
+    lastTime = time;
+}
+
+config.registerService(port, "event-service");
 
 io.on('connection', function(socket) {
-    var registeredServices = {};
     console.log('connecting:', socket.id);
-
-    function updateServiceList(target) {
-        console.log("Sending list of", sizeObject(serviceList), "services");
-        target.emit('updatedServiceList', serviceList);
-    }
-    updateServiceList(socket);
-
-    socket.on('registerService', function(service) {
-        console.log('Register received:', service);
-        serviceList[service.serviceId] = service;
-        registeredServices[service.serviceId] = service;
-        updateServiceList(io.sockets);
-    });
-
-    socket.on('unregisterService', function(serviceId) {
-        console.log('Unregister received:', serviceId);
-        delete serviceList[serviceId];
-        delete registeredServices[serviceId];
-        updateServiceList(io.sockets);
-    });
-
-    socket.on('disconnect', function() {
-        console.log('disconnecting:', socket.id);
-        Object.keys(registeredServices).forEach(function (serviceId) {
-            console.log("Removing service", serviceId, "for disconnected client", socket.id);
-            delete serviceList[serviceId];
-            delete registeredServices[serviceId];
-        });
-        updateServiceList(io.sockets);
-    });
 });
-
-console.log("Has started server on port", serverPort);
-io.listen(serverPort);

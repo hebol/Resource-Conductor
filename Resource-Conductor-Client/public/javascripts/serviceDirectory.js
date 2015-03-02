@@ -36,4 +36,3 @@ function registerConsumer(serviceType, callback) {
     consumers[serviceType].push(callback);
     notifyClients(serviceType, [callback]);
 }
-

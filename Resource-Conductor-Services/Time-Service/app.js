@@ -1,4 +1,4 @@
-process.title = 'number-sender';
+process.title = 'time-system';
 
 var io = require('socket.io')(),
     config = require('../Common/js/configService.js');
@@ -26,7 +26,6 @@ var startTimeFunction = function() {
         timeout = setInterval(tick, 1000);
         startTime = new Date();
         timeReference = timeReference || startTime;
-        console.log("startTime", startTime, "=>", timeReference, "(", timeReference.getTime(), ")");
     }
 };
 
@@ -41,6 +40,7 @@ var stopTimeFunction = function() {
 var setTimeFunction = function(time) {
     startTime = new Date();
     timeReference = new Date(time);
+    tick('set');
 };
 
 var setSpeedFunction = function(newSpeed) {
@@ -50,16 +50,17 @@ var setSpeedFunction = function(newSpeed) {
     io.sockets.emit('speed', speed);
 };
 
-var tick = function() {
-    io.sockets.emit('time', calculateSimulatedTime());
+var tick = function(param) {
+    io.sockets.emit('time', calculateSimulatedTime(), param || 'tick');
 };
 
 setTimeout(startTimeFunction, 1000);
 
+var count = 0;
 function calculateSimulatedTime() {
     var now = new Date();
     var elapsedTime = now.getTime() - startTime.getTime();
     var result = new Date(timeReference.getTime() + elapsedTime * speed);
-    console.log("Will calculate simulated time from", timeReference, timeReference.getTime(), elapsedTime, speed, "=>", result);
+    (count++ % 100 == 0) && console.log("Sim time", result);
     return result;
 }
