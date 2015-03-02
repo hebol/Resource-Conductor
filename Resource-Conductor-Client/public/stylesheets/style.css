@@ -35,14 +35,20 @@ body {
 
 #timeControl {
     position:   absolute;
-    left:      20px;
+    left:       20px;
     top:        10px;
+    width:      350px;
     z-index:    100;
     background: #9cf;
     color:      #03c;
     padding:    10px 8px 8px 8px;
     border: 2px solid;
     border-radius: 15px;
+}
+
+#timeControl .heading {
+    font-size: large;
+    font-weight: bold;
 }
 
 #timeControl * {
@@ -63,6 +69,10 @@ body {
     background-color: #cef;
     margin-left: 10px;
     float: right;
+    width: 70px;
+}
+#timeControl #setTimeButton {
+    width: 150px;
 }
 
 #timeControl #clock {
