@@ -52,6 +52,10 @@ $(document).ready(function() {
             var date = new Date(data);
             $("#clock").html(dateUtil.getTime(date));
             $("#day").html(dateUtil.getDate(date));
+            if (type == 'set') {
+                console.log("Trying to set value");
+                $("#newTime").val(date.toJSON().slice(0, 19));
+            }
         });
         socket.on('speed', function (data) {
             $speed.val(data);

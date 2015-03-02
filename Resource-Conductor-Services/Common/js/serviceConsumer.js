@@ -4,25 +4,34 @@ module.exports = function(serviceType, systemName, receiveMap) {
     var disconnectedSockets = {};
     var receiveData = receiveMap;
     var result = {
+        isConnected: function() {
+            return Object.keys(connectedSockets).length > 0;
+        },
+        autoConnect: function() {
+            config.registerServiceDiscovery(function(list) {
+                console.log("Got list of", list.length, "services");
+                list.forEach(result.connectToService);
+            });
+        },
         connectToService: function(service, callback) {
-            console.log("Asked to connect to", service);
+            console.log("Asked to connect to service of type", service.serviceType, "URL", service.url);
             var socket = connectedSockets[service.serviceId];
             var registerFunction = function (aSocket, anId, serviceId) {
-                aSocket.on(anId, function(data) {
+                aSocket.on(anId, function(data, data2, data3) {
                     if (connectedSockets[serviceId]) {
-                        receiveData && receiveData[anId] && receiveData[anId](data);
+                        receiveData && receiveData[anId] && receiveData[anId](data, data2, data3);
                     }
                 });
             };
             if (!socket) {
                 socket = disconnectedSockets[service.serviceId];
                 if (!socket) {
-                    console.log("Creating new socket for", service.serviceType);
+                    console.log("Creating new consumer socket for", service.serviceType);
                     socket = require('socket.io-client')(service.url);
                     connectedSockets[service.serviceId] = socket;
 
                     socket.on('connect', function() {
-                        console.log("Now connected to number service!");
+                        console.log("Now connected to service of type", serviceType);
                         callback && callback(true);
                     });
                     for (var funId in receiveData) {
@@ -54,7 +63,7 @@ module.exports = function(serviceType, systemName, receiveMap) {
         }
     };
     config.setup(systemName);
-    config.registerConsumer(["time-service"], result.connectToService, result.disconnectFromService);
+    config.registerConsumer([serviceType], result.connectToService, result.disconnectFromService);
     return result;
 };
 

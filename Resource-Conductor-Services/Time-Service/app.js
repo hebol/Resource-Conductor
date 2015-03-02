@@ -54,8 +54,6 @@ var tick = function(param) {
     io.sockets.emit('time', calculateSimulatedTime(), param || 'tick');
 };
 
-setTimeout(startTimeFunction, 1000);
-
 var count = 0;
 function calculateSimulatedTime() {
     var now = new Date();

@@ -8,7 +8,7 @@ var componentName;
 var hostIp = 'localhost';
 
 var uuid = require('node-uuid');
-var hasRegisteredConfig = false;
+var hasRegisteredConfig = false, serviceDiscoveryCallback;
 
 function toList(object) {
    var result = [];
@@ -21,11 +21,21 @@ function toList(object) {
 }
 
 srSocket.on('connect', function() {
-    console.log('connected to service registry');
+    console.log('Connected to service registry');
     Object.keys(registeredServices).forEach(function (service) {
         srSocket.emit('registerService', registeredServices[service]);
     });
 });
+
+srSocket.on('updatedServiceList', function(list) {
+    var filteredList = toList(list).filter(function(service){ return consumerTypes.indexOf(service.serviceType) >= 0;});
+    console.log('Received list of', Object.keys(list).length, 'services => filtered', filteredList.length);
+    serviceDiscoveryCallback && serviceDiscoveryCallback(filteredList);
+});
+
+module.exports.registerServiceDiscovery = function(callback) {
+    serviceDiscoveryCallback = callback;
+};
 
 module.exports.setup = function(aName) {
     console.log("Setting up system", aName);
@@ -43,14 +53,13 @@ module.exports.registerService = function(port, serviceType) {
         url:'ws://' + hostIp + ':' + port,
         serviceId: id
     };
-    console.log('Will register service:', registeredServices[id]);
+    console.log('Will register service:', registeredServices[id].serviceType);
 };
 
 module.exports.registerConsumer = function(typeList, connectCallback, disconnectCallback) {
     consumerConnectCallback = connectCallback;
     consumerDisconnectCallback = disconnectCallback;
     consumerTypes = typeList;
-    console.log("Hi consumer");
 };
 
 var setupConfigService = function() {
