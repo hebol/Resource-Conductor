@@ -26,8 +26,10 @@ $(document).ready(function() {
 
     map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
 
-    socket = io.connect('http://localhost:7133');
-    socket.on('time', function (data) {
-        console.log('TIME:', data);
+    registerConsumer('time-service', function(service){
+        socket = io.connect(service.url);
+        socket.on('time', function (data) {
+            console.log('TIME:', data);
+        });
     });
 });

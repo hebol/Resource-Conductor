@@ -71,6 +71,7 @@ var setupConfigService = function() {
                 canConsume: consumerTypes,
                 connectedTo: connectedToServices
             };
+            console.log("Transitting metadata", data);
             aSocket.emit('systemMetadata', data);
         });
 
@@ -78,7 +79,7 @@ var setupConfigService = function() {
             console.log('asked to connect to', service);
             connectedToServices[service.serviceId] = service;
             consumerConnectCallback && consumerConnectCallback(service, function(status) {
-                console.log('Reply from connect was', status);
+                console.log('Reply from connect was', status, "now connected to", connectedToServices);
                 aSocket.emit('connectStatus', status);
             });
             !consumerConnectCallback && aSocket.emit('connectStatus', false);

@@ -1,11 +1,11 @@
 {
-  "name"    : "service-registry",
-  "version" : "0.0.1",
-  "private" : true,
-  "scripts" : {
-    "start" : "node app.js"
+  "name": "service-registry",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
   },
-  "dependencies" : {
-    "socket.io" : "~1.3.4"
+  "dependencies": {
+    "socket.io": "~1.3.4"
   }
 }
