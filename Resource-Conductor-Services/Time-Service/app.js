@@ -16,6 +16,9 @@ io.on('connection', function(socket) {
     console.log('connecting:', socket.id);
     socket.on('startTime', startTimeFunction);
     socket.on('stopTime', stopTimeFunction);
+    socket.on('setTime', setTimeFunction);
+    socket.on('setSpeed', setSpeedFunction);
+    socket.on('querySpeed', function() {socket.emit('speed', speed)});
 });
 
 var startTimeFunction = function() {
@@ -26,12 +29,25 @@ var startTimeFunction = function() {
         console.log("startTime", startTime, "=>", timeReference, "(", timeReference.getTime(), ")");
     }
 };
+
 var stopTimeFunction = function() {
     if (timeout) {
         clearTimeout(timeout);
         timeout = null;
         timeReference = calculateSimulatedTime();
     }
+};
+
+var setTimeFunction = function(time) {
+    startTime = new Date();
+    timeReference = new Date(time);
+};
+
+var setSpeedFunction = function(newSpeed) {
+    timeReference = calculateSimulatedTime();
+    startTime = new Date();
+    speed = newSpeed;
+    io.sockets.emit('speed', speed);
 };
 
 var tick = function() {

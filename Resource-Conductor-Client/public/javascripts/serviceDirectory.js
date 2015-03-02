@@ -1,4 +1,4 @@
-var srSocket = io.connect('http://localhost:1234');
+var srSocket = io.connect(location.hostname + ':1234');
 var currentServices = [];
 var consumers = {};
 

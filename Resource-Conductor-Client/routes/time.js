@@ -3,7 +3,7 @@ var router  = express.Router();
 
 /* GET report listing. */
 router.get('/', function(req, res, next) {
-    res.send('TIME: not implemented');
+    res.render('time', { title: 'Time Control' });
 });
 
 module.exports = router;

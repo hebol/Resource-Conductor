@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="https://cdn.socket.io/socket.io-1.3.4.js"></script>
+    <script type="text/javascript" src="/javascripts/jquery.js"></script>
+    <script type="text/javascript" src="/javascripts/dateUtil.js"></script>
+    <script type="text/javascript" src="/javascripts/serviceDirectory.js"></script>
+    <script type="text/javascript" src="/javascripts/time.js"></script>
+</head>
+<body>
+<div id="timeControl">
+    <div>Time Control</div>
+    <div id="currentTime"><label>Current time</label><span id="clock"></span><span id="day"></span></div>
+    <div id="setTime"><input type="datetime-local" id="newTime"><button id="setTimeButton">Ställ in ny tid</button></div>
+    <div>Speed<select id="speedOptions"></select><button id="stopButton">Stop</button><button id="startButton">Start</button></div>
+</div>
+<div id='map-canvas'></div>
+</body>
+</html>

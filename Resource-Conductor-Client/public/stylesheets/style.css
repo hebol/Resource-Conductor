@@ -24,11 +24,53 @@ body {
 }
 
 
-#clock {
+#date #clock {
     font-size:  26px;
 }
 
-#day{
+#date #day{
     font-size:  12px;
     text-align: center;
+}
+
+#timeControl {
+    position:   absolute;
+    left:      20px;
+    top:        10px;
+    z-index:    100;
+    background: #9cf;
+    color:      #03c;
+    padding:    10px 8px 8px 8px;
+    border: 2px solid;
+    border-radius: 15px;
+}
+
+#timeControl * {
+    background-color: #9cf;
+    margin-top: 3px;
+}
+
+#timeControl input {
+    background-color: #cef;
+}
+
+#timeControl select {
+    background-color: #cef;
+    margin-left: 10px;
+}
+
+#timeControl button {
+    background-color: #cef;
+    margin-left: 10px;
+    float: right;
+}
+
+#timeControl #clock {
+    margin-left: 5px;
+    float: right;
+}
+
+#timeControl #day {
+    margin-left: 5px;
+    float: right;
 }
