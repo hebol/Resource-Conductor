@@ -8,6 +8,10 @@ body {
     padding: 0;
 }
 
+a {
+    color: inherit;
+}
+
 #map-canvas {
     height:  100%;
     z-index: 0;
@@ -53,7 +57,7 @@ body {
 
 #timeControl * {
     background-color: #9cf;
-    margin-top: 3px;
+    margin-top:       3px;
 }
 
 #timeControl input {
@@ -67,9 +71,9 @@ body {
 
 #timeControl button {
     background-color: #cef;
-    margin-left: 10px;
-    float: right;
-    width: 70px;
+    margin-left:      10px;
+    float:            right;
+    width:            70px;
 }
 #timeControl #setTimeButton {
     width: 150px;
@@ -77,10 +81,10 @@ body {
 
 #timeControl #clock {
     margin-left: 5px;
-    float: right;
+    float:       right;
 }
 
 #timeControl #day {
     margin-left: 5px;
-    float: right;
+    float:       right;
 }
