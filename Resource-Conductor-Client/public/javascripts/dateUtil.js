@@ -1,9 +1,9 @@
 dateUtil = {
     day: [
-        "Söndag", "Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag"
+        "söndag", "måndag", "tisdag", "onsdag", "torsdag", "fredag", "lördag"
     ],
     month: [
-        "Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"
+        "jan", "feb", "mar", "apr", "maj", "jun", "jul", "aug", "sep", "okt", "nov", "dec"
     ],
     padTime: function(time) {
        return ("00" + time).slice(-2);
