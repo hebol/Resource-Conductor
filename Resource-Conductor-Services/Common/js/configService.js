@@ -71,7 +71,7 @@ var setupConfigService = function() {
                 canConsume: consumerTypes,
                 connectedTo: connectedToServices
             };
-            console.log("Transitting metadata", data);
+            console.log("Transmitting metadata", data);
             aSocket.emit('systemMetadata', data);
         });
 
@@ -123,7 +123,7 @@ Object.keys(ifaces).forEach(function (ifname) {
             console.log(ifname + ':' + alias, iface.address);
             hostIp = iface.address;
         } else {
-            // this interface has only one ipv4 adress
+            // this interface has only one ipv4 address
             console.log(ifname, iface.address);
             hostIp = iface.address;
         }
