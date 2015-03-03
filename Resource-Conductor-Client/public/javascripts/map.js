@@ -26,12 +26,14 @@ $(document).ready(function() {
 
     map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
 
-    registerConsumer('time-service', function(service){
-        socket = io.connect(service.url);
-        socket.on('time', function (data) {
-            var date = new Date(data);
-            $("#clock").html(dateUtil.getTime(date));
-            $("#day").html(dateUtil.getDate(date));
+    if (socket == null) {
+        registerConsumer('time-service', function(service){
+            socket = io.connect(service.url);
+            socket.on('time', function (data) {
+                var date = new Date(data);
+                $("#clock").html(dateUtil.getTime(date));
+                $("#day").html(dateUtil.getDate(date));
+            });
         });
-    });
+    }
 });

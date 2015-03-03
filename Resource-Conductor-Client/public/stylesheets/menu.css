@@ -2,7 +2,7 @@
     z-index:      100;
     position:     absolute;
     bottom:       15px;
-    left:         60px;
+    left:         40px;
     margin-left:  -80px;
     padding-top:  20px;
     padding-left: 80px;
@@ -29,10 +29,6 @@
     transform:          translate3d(0, 0, 0);
     -webkit-transition: -webkit-transform ease-out 200ms;
     transition:         transform ease-out 200ms;
-}
-
-.menu-open {
-    display: none;
 }
 
 .hamburger {

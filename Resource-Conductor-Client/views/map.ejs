@@ -6,6 +6,8 @@
       <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
       <link rel='stylesheet' href='/stylesheets/style.css' />
       <link rel='stylesheet' href='/stylesheets/menu.css' />
+      <link rel="stylesheet" href="//code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css">
+      <script src="//code.jquery.com/ui/1.11.3/jquery-ui.js"></script>
 
       <script src="https://cdn.socket.io/socket.io-1.3.4.js"></script>
       <script type="text/javascript"
@@ -19,10 +21,11 @@
       <script type="text/javascript" src="/javascripts/time.js"></script>
   </head>
   <body>
-    <div id="date">
-        <div id="clock"></div>
-        <div id="day"></div>
-    </div>
+      <div id="date">
+          <div id="clock"></div>
+          <div id="day"></div>
+      </div>
+
 
     <nav class="menu">
         <input type="checkbox" href="#" class="menu-open" name="menu-open" id="menu-open"/>
@@ -32,7 +35,7 @@
             <span class="hamburger hamburger-3"></span>
         </label>
 
-        <a href="#" class="menu-item"> <i class="fa fa-map-marker"></i> </a>
+        <a href="#" onclick="$('#map-canvas').toggle();" class="menu-item"> <i class="fa fa-map-marker"></i> </a>
         <a href="#" class="menu-item"> <i class="fa fa-ambulance"></i> </a>
         <a href="#" class="menu-item"> <i class="fa fa-bar-chart"></i> </a>
         <a href="#" onclick="$('#timeControl').toggle()" class="menu-item"> <i class="fa fa-clock-o"></i> </a>
@@ -40,9 +43,19 @@
 
     <div id="timeControl" style="display: none">
         <div class="heading">Time Control</div>
-        <div id="currentTime"><span>Current time</span><span id="clock"></span><span id="day"></span></div>
-        <div id="setTime"><input type="datetime-local" id="newTime"><button id="setTimeButton">Ställ in ny tid</button></div>
-        <div><span>Speed</span><select id="speedOptions"></select><button id="stopButton">Stop</button><button id="startButton">Start</button></div>
+        <div id="setTime">
+            <input type="datetime-local" id="newTime">
+            <a href="#" id="setTimeButton" class="myButton">Set new time</a>
+        </div>
+        <div class="styledSelect">
+            <span class="label">Simulation speed</span>
+            <select id="speedOptions">
+            </select>
+        </div>
+        <div>
+            <a href="#" id="stopButton" class="myButton first">Stop</a>
+            <a href="#" id="startButton" class="myButton">Start</a>
+        </div>
     </div>
 
     <div id='map-canvas'></div>
