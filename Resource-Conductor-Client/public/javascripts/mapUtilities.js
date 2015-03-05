@@ -2,6 +2,9 @@ var mapMarkers = [];
 var mapOptions;
 var map;
 
+//---------------------------------------------------------------------------
+// Initialize the map
+//---------------------------------------------------------------------------
 var initMap = function(latitude, longitude) {
     mapOptions = {
         zoom:           13,
@@ -28,12 +31,18 @@ var initMap = function(latitude, longitude) {
     map = map || new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
 };
 
-
+//---------------------------------------------------------------------------
+// Convert input to Google LatLong
+//---------------------------------------------------------------------------
 var toLatLng = function(latitude, longitude) {
     return new google.maps.LatLng(latitude, longitude);
 };
 
 
+//---------------------------------------------------------------------------
+// Add and cache a marker to the map. If a marker exists for the
+// "object.id + type" only move it to its new position.
+//---------------------------------------------------------------------------
 var createOrUpdateMarker = function(object, title, infoText, type) {
     var pos;
     if (object.hasOwnProperty('latitude')) {
@@ -67,6 +76,7 @@ var createOrUpdateMarker = function(object, title, infoText, type) {
     marker.setTitle(title);
     //marker.setIcon("<awesome and relevant icon>");
 
+    // Add marker to cache
     mapMarkers[type + object.id] = marker;
 
     return marker;
