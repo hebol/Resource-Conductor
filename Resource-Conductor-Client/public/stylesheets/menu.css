@@ -14,6 +14,15 @@
 
 }
 
+
+.caption {
+    font-size: 11px;
+}
+
+.menu-symbol {
+    vertical-align: middle;
+}
+
 .menu-item, .menu-open-button {
     background:         #000;
     color:              white;
