@@ -19,6 +19,7 @@ io.on('connection', function(socket) {
     socket.on('setTime', setTimeFunction);
     socket.on('setSpeed', setSpeedFunction);
     socket.on('querySpeed', function() {socket.emit('speed', speed)});
+    timeReference && socket.emit('time', timeReference, 'set');
 });
 
 var startTimeFunction = function() {

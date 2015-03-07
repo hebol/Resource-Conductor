@@ -10,10 +10,14 @@ $(document).ready(function() {
     if (timeSocket == null) {
         registerConsumer('time-service', function(service) {
             timeSocket = io.connect(service.url);
-            timeSocket.on('time', function (data) {
+            timeSocket.on('time', function (data, type) {
                 var date = new Date(data);
                 $("#clock").html(dateUtil.getTime(date));
                 $("#day").html(dateUtil.getDate(date));
+                if (type == 'set') {
+                    console.log("Trying to set value");
+                    $("#newTime").val(date.toJSON().slice(0, 19));
+                }
             });
         });
     }
