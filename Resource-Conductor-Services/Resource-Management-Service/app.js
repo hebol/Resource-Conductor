@@ -12,6 +12,7 @@ config.registerService(port, "resource-service");
 io.on('connection', function(socket) {
     console.log('connecting:', socket.id);
     notifySubscribers(socket, stations);
+    notifySubscribers(socket, units);
 });
 
 var stations;
