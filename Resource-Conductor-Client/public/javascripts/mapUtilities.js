@@ -61,12 +61,9 @@ var createOrUpdateMarker = function(object, title, infoText, type) {
                 google.maps.event.addListener(marker['infoListener']);
             }
 
+            var infowindow = new google.maps.InfoWindow({content: infoText});
             marker['infoListener'] = google.maps.event.addListener(marker, 'click', function() {
-                var infoWindow;
-                (function() {
-                    infowindow = infoWindow || new google.maps.InfoWindow({content: infoText});
-                    infowindow.open(map, marker);
-                })();
+                infowindow.open(map, marker);
             });
         }
     } else {
