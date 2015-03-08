@@ -43,7 +43,7 @@ $(document).ready(function() {
                 data.forEach(function(resource) {
                     (function() {
                         if (resource.type === "S") {
-                            createOrUpdateMarker(resource, resource.Ambulansstation, resource.Area, "station");
+                            createOrUpdateMarker(resource, resource.name, resource.Area, "station");
                         } else if (resource.type === "A") {
                             createOrUpdateMarker(resource, resource.name, resource.homestation, "ambulance");
                         }
