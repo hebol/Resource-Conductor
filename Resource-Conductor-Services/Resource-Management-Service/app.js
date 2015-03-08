@@ -25,7 +25,7 @@ var readData = function (filename) {
         console.log("Has read data file", filename);
         if (err) { throw err;}
         var data = JSON.parse(data);
-        resources = data.resources;
+        resources = data.stations;
         notifySubscribers(io.sockets, resources);
     });
 };
