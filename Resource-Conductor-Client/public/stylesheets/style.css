@@ -14,6 +14,13 @@ a {
     color: inherit;
 }
 
+h1 {
+    font-size:     26px;
+    font-weight:   normal;
+    margin:        0;
+    margin-bottom: 25px;
+}
+
 #map-canvas {
     height:  100%;
     z-index: 0;
@@ -24,7 +31,7 @@ a {
     right:      15px;
     top:        10px;
     z-index:    100;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(80, 80, 80, 0.5);
     color:      #fff;
     padding:    5px 3px 3px 3px;
 }
@@ -44,9 +51,10 @@ a {
     top:        10px;
     width:      315px;
     height:     182px;
-    background: #000;
+    background: #555;
     color:      #fff;
     padding:    10px 8px 8px 8px;
+    border:     1px solid #222;
 }
 
 #timeControl .heading {
@@ -113,4 +121,30 @@ a {
     border:        0;
     border-radius: 0;
     height:        34px;
+}
+
+#report {
+    position:   absolute;
+    background: #999;
+    border:     1px solid #222;
+    color:      #fff;
+    top:        10px;
+    left:       160px;
+    overflow:   auto;
+    padding:    10px;
+    margin:     0;
+    width:      60%;
+    max-height: 700px;
+    z-index:    50;
+}
+
+#reportTable {
+    height: inherit;
+    margin: 0;
+    padding: 0;
+    color:   #fff;
+}
+
+tbody {
+    color: #000;
 }

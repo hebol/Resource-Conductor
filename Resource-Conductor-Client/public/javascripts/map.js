@@ -6,6 +6,7 @@ $(document).ready(function() {
     // Initialize the map and add it to the map-canvas
     initMap(57.70, 11.95);
 
+    var reportTable = $("#reportTable").dataTable({columns: [{ data: 'id' }, { data: 'name' }, { data: 'area' }]});
 
     // Subscribe to time updates
     if (timeSocket == null) {
@@ -39,14 +40,16 @@ $(document).ready(function() {
         registerConsumer('resource-service', function(service) {
             resourceSocket = io.connect(service.url);
             resourceSocket.on('resourcesUpdated', function (data) {
-                console.log(data);
                 data.forEach(function(resource) {
                     (function() {
                         if (resource.type === "S") {
+                            reportTable.fnAddData(resource);
                             createOrUpdateMarker(resource, resource.name, resource.area, "station");
                         } else if (resource.type === "A") {
                             createOrUpdateMarker(resource, resource.name, resource.homeStation, "ambulance");
                         }
+
+//                        $('#reportTable > tbody:last').append('<tr> <th>Time</th> <th>ID</th> <th>Event</th> </tr>');
                     })();
                 });
             });

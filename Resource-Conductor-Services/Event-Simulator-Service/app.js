@@ -19,9 +19,9 @@ var lastTime;
 var eventList = [];
 
 function processEvents(fromTime, toTime) {
-    var events = eventList.filter(function(anEvent) {return anEvent.time.getTime() > fromTime.getTime() && anEvent.time.getTime() <= toTime.getTime()});
+    // var events = eventList.filter(function(anEvent) {return anEvent.time.getTime() > fromTime.getTime() && anEvent.time.getTime() <= toTime.getTime()});
 
-    events.forEach(function(anEvent) {io.sockets.emit('event', anEvent); console.log("Sending event", anEvent)});
+    eventList.forEach(function(anEvent) {io.sockets.emit('event', anEvent); console.log("Sending event", anEvent)});
 }
 
 function processTimeEvent(time, type) {
