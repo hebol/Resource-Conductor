@@ -7,6 +7,6 @@ sleep 1
 newtab eval "Display ; cd `dirname $0` ; cd Resource-Conductor-Client                               ; nodemon bin/www"
 sleep 1
 newtab eval "Event   ; cd `dirname $0` ; cd Resource-Conductor-Services/Event-Simulator-Service     ; nodemon app.js"
-#sleep 1
-#newtab eval "Resource; cd `dirname $0` ; cd Resource-Conductor-Services/Resource-Conductor-Services ; nodemon app.js"
+sleep 1
+newtab eval "Resource; cd `dirname $0` ; cd Resource-Conductor-Services/Resource-Management-Service ; nodemon app.js"
 

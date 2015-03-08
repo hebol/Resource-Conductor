@@ -1,53 +1,33 @@
-var serverPort = 1234;
-var io         = require('socket.io')();
+process.title = 'resource-system';
 
-var serviceList = {};
+var io = require('socket.io')(),
+    config = require('../Common/js/configService.js'),
+    fs = require('fs');
 
-var sizeObject = function(obj) {
-    var size = 0;
-    var key;
-    for (key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            size++;
-        }
-    }
-    return size;
-};
+var port = io.listen(0).httpServer.address().port;
+console.log("Has started server on port", port);
+
+config.registerService(port, "resource-service");
 
 io.on('connection', function(socket) {
-    var registeredServices = {};
     console.log('connecting:', socket.id);
-
-    function updateServiceList(target) {
-        console.log("Sending list of", sizeObject(serviceList), "services");
-        target.emit('updatedServiceList', serviceList);
-    }
-    updateServiceList(socket);
-
-    socket.on('registerService', function(service) {
-        console.log('Register received:', service);
-        serviceList[service.serviceId] = service;
-        registeredServices[service.serviceId] = service;
-        updateServiceList(io.sockets);
-    });
-
-    socket.on('unregisterService', function(serviceId) {
-        console.log('Unregister received:', serviceId);
-        delete serviceList[serviceId];
-        delete registeredServices[serviceId];
-        updateServiceList(io.sockets);
-    });
-
-    socket.on('disconnect', function() {
-        console.log('disconnecting:', socket.id);
-        Object.keys(registeredServices).forEach(function (serviceId) {
-            console.log("Removing service", serviceId, "for disconnected client", socket.id);
-            delete serviceList[serviceId];
-            delete registeredServices[serviceId];
-        });
-        updateServiceList(io.sockets);
-    });
+    notifySubscribers(socket, resources);
 });
 
-console.log("Has started server on port", serverPort);
-io.listen(serverPort);
+var resources;
+
+var notifySubscribers = function (sockets, resources) {
+    sockets.emit('resourcesUpdated', resources);
+};
+
+var readData = function (filename) {
+    fs.readFile(filename, 'utf8', function (err, data) {
+        console.log("Has read data file", filename);
+        if (err) { throw err;}
+        var data = JSON.parse(data);
+        resources = data.resources;
+        notifySubscribers(io.sockets, resources);
+    });
+};
+
+readData('resources.json');
