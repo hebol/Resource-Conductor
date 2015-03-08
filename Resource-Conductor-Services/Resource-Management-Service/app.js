@@ -11,13 +11,31 @@ config.registerService(port, "resource-service");
 
 io.on('connection', function(socket) {
     console.log('connecting:', socket.id);
-    notifySubscribers(socket, resources);
+    notifySubscribers(socket, stations);
 });
 
-var resources;
+var stations;
+var units;
 
 var notifySubscribers = function (sockets, resources) {
     sockets.emit('resourcesUpdated', resources);
+};
+
+var getStation = function (name, stationList) {
+    var found = stationList.filter(function(station) { return name == station.name;});
+    return found.length > 0 && found[0];
+};
+
+var calculateStartPositions = function (unitList, stationList) {
+    unitList.forEach( function(unit) {
+        var station = getStation(unit.homeStation, stationList);
+        if (!station) {
+            console.error("No station found for unit", unit);
+        } else {
+            unit.latitude = station.latitude;
+            unit.longitude = station.longitude;
+        }
+    });
 };
 
 var readData = function (filename) {
@@ -25,8 +43,11 @@ var readData = function (filename) {
         console.log("Has read data file", filename);
         if (err) { throw err;}
         var data = JSON.parse(data);
-        resources = data.stations;
-        notifySubscribers(io.sockets, resources);
+        stations = data.stations;
+        units = data.units;
+        notifySubscribers(io.sockets, stations);
+        calculateStartPositions(units, stations);
+        notifySubscribers(io.sockets, units);
     });
 };
 
