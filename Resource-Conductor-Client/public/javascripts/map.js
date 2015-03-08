@@ -1,5 +1,6 @@
 var timeSocket;
 var eventSocket;
+var resourceSocket;
 
 $(document).ready(function() {
     // Initialize the map and add it to the map-canvas
@@ -28,7 +29,23 @@ $(document).ready(function() {
             eventSocket = io.connect(service.url);
             eventSocket.on('event', function (data) {
                 console.log(data);
-                createOrUpdateMarker(data,  "Event-" + data.id, data.address, "Event");
+                createOrUpdateMarker(data,  "Event-" + data.id, data.address, "event");
+            });
+        });
+    }
+
+    // Subscribe to event updates
+    if (resourceSocket == null) {
+        registerConsumer('resource-service', function(service) {
+            resourceSocket = io.connect(service.url);
+            resourceSocket.on('resourcesUpdated', function (data) {
+                if (data.hasOwnProperty("stations")) {
+                    data.stations.forEach(function(station) {
+                        (function() {
+                            createOrUpdateMarker(station, station.Ambulansstation, station.Area, "station");
+                        })();
+                    });
+                }
             });
         });
     }

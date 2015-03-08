@@ -51,6 +51,7 @@ var createOrUpdateMarker = function(object, title, infoText, type) {
         console.log("No position for: ", object);
     }
 
+
     var marker = mapMarkers[type + object.id];
 
     if (!marker) {
@@ -71,10 +72,11 @@ var createOrUpdateMarker = function(object, title, infoText, type) {
     }
 
     marker.setTitle(title);
-    //marker.setIcon("<awesome and relevant icon>");
+    marker.setIcon("images/"+type+ ".png");
 
     // Add marker to cache
     mapMarkers[type + object.id] = marker;
+    console.log("added marker: " + title + "(" +object.id + ") at " + pos);
 
     return marker;
 };

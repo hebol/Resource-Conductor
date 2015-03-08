@@ -1,16 +1,16 @@
     =================================================================================
 [ ] RESOURCE-CONDUCTOR-CLIENT (MAP VIEW)
     =================================================================================
-    [ ] Construct a user interface that uses google maps
+    [X] Construct a user interface that uses google maps
     [ ] Create/find appropriate symbols for:
         [ ] Ambulance that also shows its state (free, occupied)
         [ ] Hospital
         [ ] Event/accident (with four different levels/priorities
         [ ] Home of patient
-    [ ] Make it possible to add symbols to the map
+    [X] Make it possible to add symbols to the map
     [ ] Access: RESOURCE-MANAGEMENT-SERVICE->symbolFor(...) to ask for the
         appropriate symbols given an event or maybe id/type.
-    [ ] Subscribe to: TIME-SERVICE->subscribe() and show current time as an overlay
+    [X] Subscribe to: TIME-SERVICE->subscribe() and show current time as an overlay
         on the map
     [ ] Subscribe to: EVENT-SIMULATOR-SERVICE-subscribe() to get events that shall
         be presented on the map using the symbols from RESOURCE-MANAGEMENT-SERVICE
