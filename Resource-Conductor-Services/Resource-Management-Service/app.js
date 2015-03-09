@@ -41,11 +41,11 @@ var calculateStartPositions = function (unitList, stationList) {
 
 var readData = function (filename) {
     fs.readFile(filename, 'utf8', function (err, data) {
-        console.log("Has read data file", filename);
         if (err) { throw err;}
         var data = JSON.parse(data);
         stations = data.stations;
         units = data.units;
+        console.log("Has read data file", filename, stations.length, "stations and", units.length, "ambulances");
         notifySubscribers(io.sockets, stations);
         calculateStartPositions(units, stations);
         notifySubscribers(io.sockets, units);
