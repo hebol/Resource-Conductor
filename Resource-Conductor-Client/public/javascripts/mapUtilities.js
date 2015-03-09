@@ -76,7 +76,7 @@ var createOrUpdateMarker = function(object, title, infoText, type) {
 
     // Add marker to cache
     mapMarkers[type + object.id] = marker;
-    console.log("added marker: " + title + " (id=" +object.id + ") at " + pos);
+    //console.log("added marker: " + title + " (id=" +object.id + ") at " + pos);
 
     return marker;
 };

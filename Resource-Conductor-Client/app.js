@@ -7,7 +7,7 @@ var bodyParser   = require('body-parser');
 
 var mapRoute     = require('./routes/map');
 var reportRoute  = require('./routes/report');
-var resMgmtRoute = require('./routes/resMgmt');
+var resMgmtRoute = require('./routes/resourceManagement');
 var timeRoute    = require('./routes/time');
 
 var app = express();

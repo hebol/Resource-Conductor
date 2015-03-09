@@ -18,18 +18,23 @@ consumer.autoConnect();
 var lastTime;
 var eventList = [];
 
-function processEvents(fromTime, toTime) {
-    // var events = eventList.filter(function(anEvent) {return anEvent.time.getTime() > fromTime.getTime() && anEvent.time.getTime() <= toTime.getTime()});
+function processEvents(target, fromTime, toTime) {
+    console.log('processEvents(', fromTime, ',', toTime, ')');
+    var events = eventList.filter(function(anEvent) {return anEvent.time.getTime() > fromTime.getTime() && anEvent.time.getTime() <= toTime.getTime()});
 
-    eventList.forEach(function(anEvent) {io.sockets.emit('event', anEvent); console.log("Sending event", anEvent)});
+    events.forEach(function(anEvent) {target.emit('event', anEvent); console.log("Sending event", anEvent)});
 }
 
 function processTimeEvent(time, type) {
     time = new Date(time);
     console.log("processTimeEvent(",time,",", type, ")");
-    if (type == 'tick' && lastTime) {
-        processEvents(lastTime, time);
+    if (type == 'set') {
+        lastTime = new Date(0);
+        processEvents(io.sockets, lastTime, time);
+    } else {
+        lastTime && processEvents(io.sockets, lastTime, time);
     }
+
     lastTime = time;
 }
 
@@ -37,6 +42,7 @@ config.registerService(port, "event-service");
 
 io.on('connection', function(socket) {
     console.log('connecting:', socket.id);
+    lastTime && processEvents(socket, new Date(0), lastTime);
 });
 
 var setStartTime = function (startTime) {

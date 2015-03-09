@@ -1,0 +1,181 @@
+/*********************************************
+	CASE LIST CONTAINER
+**********************************************/
+
+#case-list {
+    float:left;
+    z-index: 99;
+    position: absolute;
+    left:10px;
+    top:10px;
+}
+
+#case-list ul {
+    max-height:645px;
+    overflow:auto;
+    background-color:rgba(128, 128, 128, 0.5);
+    list-style-type: none;
+    margin:0;
+    padding:0;
+    width:385px;
+    float:left;
+}
+
+#case-list ul li {
+    border:1px solid #aaa;
+    float:left;
+    position:relative;
+    margin-bottom:2px;
+    cursor:pointer;
+}
+
+#case-list ul li .case {
+    width:354px;
+    height:38px;
+    padding: 4px;
+    float:left;
+    text-overflow: unset;
+}
+
+
+#case-list ul li .case .case-type {
+    border:1px solid #000;
+    background: #fff;
+    font-size: 150%;
+    text-align: center;
+    width:32px;
+    height:32px;
+    margin:0;
+    float:left;
+}
+
+#case-list ul li i {
+    padding-right:5px;
+    padding-top:15px;
+    padding-left:5px;
+    text-align:right;
+    float:right;
+}
+
+#case-list ul li .title{
+    float:left;
+    margin-left:10px;
+    font-weight:bold;
+    width: 250px;
+}
+
+#case-list ul li .desc {
+    float:left;
+    margin-left:10px;
+    font-style:italic;
+    font-size:80%;
+    margin-top: 4px;
+}
+
+#case-list ul li .case .time-1 {
+    float:right;
+}
+
+#case-list ul li .case .alloc {
+    float:right;
+    font-size:80%;
+    margin-top: 4px;
+    font-style:italic;
+    padding: 2px 0 2px 0;
+    border-style: solid;
+    border-width: 1px 2px 2px 1px;
+    border-color: #888;
+}
+
+#case-list ul li .case .alloc .allocQ {
+    padding: 2px 2px 2px 2px;
+    background: #bbb;
+}
+
+#case-list ul li .case .alloc .allocOk {
+    padding: 2px 2px 2px 2px;
+    color: #fff;
+    background: #bbb;
+}
+
+#case-list ul li .case .alloc .allocNo {
+    padding: 2px 2px 2px 2px;
+    background: #bbb;
+}
+
+
+/*********************************************
+	UNIT LIST CONTAINER
+**********************************************/
+
+#unit-list  {
+    width:175px;
+    float:left;
+    left: 410px;
+    position: absolute;
+    top:10px;
+    /*display:none;*/
+}
+
+#unit-list ul {
+    max-height:645px;
+    overflow:auto;
+    background-color:rgba(128, 128, 128, 0.5);
+    list-style-type: none;
+    margin:0;
+    padding:0;
+    width:160px;
+    float:left;
+}
+
+#unit-list li {
+    height:30px;
+    width:145px;
+}
+
+#unit-list ul li .unit {
+    height:25px;
+    padding: 4px;
+    width:140px;
+    margin:0;
+}
+
+#unit-list ul li .status {
+    border:1px solid #000;
+    background: #aaa;
+    width:20px;
+    height:20px;
+    margin:0;
+    float:left;
+}
+
+#unit-list ul li .unitName {
+    float:left;
+    margin-left:10px;
+    font-weight:bold;
+}
+
+#unit-list ul li .queried {
+    text-align:center;
+    background: #ff0;
+}
+
+#unit-list ul li .agreed {
+    text-align:center;
+    background: #3f0;
+}
+
+#unit-list ul li .disagreed {
+    text-align:center;
+    background: #f33;
+}
+
+#unit-list ul li .arrived {
+    text-align:center;
+    background: #2b0;
+}
+
+#unit-list ul li .finished {
+    text-align:center;
+    background: #fff;
+}
