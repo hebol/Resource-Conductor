@@ -41,7 +41,8 @@ io.on('connection', function(socket) {
     socket.on('disconnect', function() {
         console.log('disconnecting:', socket.id);
         Object.keys(registeredServices).forEach(function (serviceId) {
-            console.log("Removing service", serviceId, "for disconnected client", socket.id);
+            var service = serviceList[serviceId];
+            console.log("Removing service", serviceId, "for disconnected client", socket.id, "type", service.serviceType);
             delete serviceList[serviceId];
             delete registeredServices[serviceId];
         });

@@ -10,10 +10,32 @@ console.log("Has started server on port", port);
 config.registerService(port, "resource-service");
 
 io.on('connection', function(socket) {
-    console.log('connecting:', socket.id);
+    console.log('client', socket.id, 'connecting');
     notifySubscribers(socket, stations);
     notifySubscribers(socket, units);
+
+    socket.on('assignResourceToCase', function(unitId, caseId) {
+        console.log("Asked to assign resource", unitId, "to case", caseId);
+        var aCase = events[caseId];
+        aCase && (events[caseId].resource = unitId);
+        console.log("Should now find route to", aCase.latitude, aCase.longitude);
+    });
+
 });
+
+var events = {};
+
+function processEvent(event) {
+    events[event.id] = event;
+}
+
+var consumer = require('../Common/js/serviceConsumer')('event-service', process.title,
+    {
+        'event': processEvent
+    }
+);
+consumer.autoConnect();
+
 
 var stations;
 var units;

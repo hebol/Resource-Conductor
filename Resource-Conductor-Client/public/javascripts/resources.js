@@ -1,21 +1,27 @@
-var socket, $events;
+var eventSocket, resourceSocket, $events, $units;
+
+function toList(aMap) {
+    var result = [];
+    for (var id in aMap) {
+        if (aMap.hasOwnProperty(id)) {
+            result.push(aMap[id]);
+        }
+    }
+    return result;
+}
+
 
 var createCaseListItem = function(myCase) {
-    //console.log("Will create item for case:", myCase);
     var getStatusColor = function() {
         return 'light-grey-gradient';
     };
     var getSortValue = function (anEvent) {
-        return anEvent.casepriority + "." + (1 - ("0." + new Date(anEvent.time).getTime()));
+        return anEvent.prio + "." + (1 - ("0." + new Date(anEvent.time).getTime()));
     };
     var $li       = $('<li>', {class:getStatusColor(), id:'event-'+myCase.id, sortvalue: getSortValue(myCase)});
     var $case     = $('<div>', {class:'case'}).on("click",function() {
-        selectCase(myCase, false);
+        setSelectedCase(myCase);
     });
-    //
-    //var $i        = $('<i/>', {class:'fa fa-play'}).on('click',function() {
-    //    selectCase(myCase, true);
-    //});
 
     var $caseType = $('<div>', {class:'case-type',      text:myCase.prio});
     var $title    = $('<div>', {class:'title ellipsis', text:myCase.address});
@@ -29,22 +35,59 @@ var createCaseListItem = function(myCase) {
     $case.append($nl);
     $case.append($desc);
 
-    //$case.append($('<div>', {class:'alloc'}));
-    //updateCaseDivWithUsers($case, myCase);
-
     $li.append($case);
-    //$li.append($i);
 
     return $li;
 };
 
-var createUserListItem = function(aUnit) {
+var setSelectedCase = function (aCase) {
+    $units.empty();
+    for (var unitId in unitList) {
+        var unit = unitList[unitId];
+        $units.append(createUnitListItem(unit, aCase));
+    }
+
+    var listItems = $units.children('li').get();
+    listItems.sort(function(a, b) {
+        return $(a).attr('distance') - $(b).attr('distance');
+    });
+    $.each(listItems, function(idx, itm) { $units.append(itm);});
+};
+
+function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+    var deg2rad = function(deg) {
+        return deg * (Math.PI/180);
+    };
+    var R = 6371; // Radius of the earth in km
+    var dLat = deg2rad(lat2 - lat1);  // deg2rad below
+    var dLon = deg2rad(lon2 - lon1);
+    var a =
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon/2) * Math.sin(dLon/2)
+        ;
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c; // Distance in km
+}
+
+var calculateDistance = function (aUnit, anEvent) {
+    var distance = getDistanceFromLatLonInKm(aUnit.latitude, aUnit.longitude, anEvent.latitude, anEvent.longitude);
+    return Math.round(distance * 100) / 100;
+};
+
+var assignResourceToCase = function (aUnit, anEvent) {
+    resourceSocket.emit('assignResourceToCase', aUnit.id, anEvent.id);
+};
+
+var createUnitListItem = function(aUnit, anEvent) {
     var getStatusColor = function() {
         return 'light-blue-gradient';
     };
-    var $li       = $('<li>', {class:getStatusColor(), id:'unit-'+aUnit.id});
+
+    var distance = calculateDistance(aUnit, anEvent);
+    var $li       = $('<li>', {class:getStatusColor(), id:'unit-'+aUnit.id, distance: distance});
     var $user = $('<div>', {class:'unit'}).on("click",function() {
-        setSelected($(this).parent(), 'unitSelected');
+        assignResourceToCase(aUnit, anEvent);
     });
     var $nl1       = $('<br/>');
     var $nl2       = $('<br/>');
@@ -60,16 +103,16 @@ var createUserListItem = function(aUnit) {
             $status  = $('<div>', {class:'status transport', text:'T'});
             break;
         case "U":
-            $status  = $('<div>', {class:'status accepted', text:'U'});
+            $status  = $('<div>', {class:'status accepted',  text:'U'});
             break;
         case "F":
-            $status  = $('<div>', {class:'status arrived', text:'F'});
+            $status  = $('<div>', {class:'status arrived',   text:'F'});
             break;
         case "L":
-            $status  = $('<div>', {class:'status loaded', text:'L'});
+            $status  = $('<div>', {class:'status loaded',    text:'L'});
             break;
         case "S":
-            $status  = $('<div>', {class:'status hospital', text:'S'});
+            $status  = $('<div>', {class:'status hospital',  text:'S'});
             break;
         case "H":
             $status  = $('<div>', {class:'status homebound', text:'H'});
@@ -79,32 +122,18 @@ var createUserListItem = function(aUnit) {
     }
 
     var $name       = $('<div>', {class:'unitName',    text:aUnit.name});
-    //var $phone      = $('<div>', {class:'phoneNumber', text:aUnit.phoneNumber});
-    //var $statusTime = $('<div>', {class:'w-title',     text:getLastTimestamp(aUnit)});
-    //var $eta        = $('<div>', {class:'eta',         text:durationToString(aUnit.duration)});
+    var $statusTime = $('<div>', {class:'w-title',   text:""});
+    var $distance    = $('<div>', {class:'distance',  text:distance + " km"});
     var $locate     = $('<i>',   {class:'locate fa fa-male fa-2x'}).on('click', function() {
         panMapToUser(aUnit);
     });
-    //var $actionButton;
-    //if (aUnit.queryStatus) {
-    //    $actionButton   = $('<i>', {class:'notify fa fa-trash-o fa-2x'}).on('click', function(){
-    //        removeUserFromCase(aUnit.id, currentCase.id);
-    //    });
-    //} else {
-    //    if (currentCase) {
-    //        $actionButton   = $('<i>', {class:'notify fa fa-mobile-phone fa-2x'}).on('click', function(){
-    //            allocateUserForCase(aUnit.id, currentCase.id);
-    //        });
-    //    }
-    //}
 
     $user.append($status);
     $user.append($name);
-    //$user.append($phone);
     $user.append($nl1);
     //$statusTime.append($nl3);
-    //$statusTime.append($eta);
-    //$user.append($statusTime);
+    $statusTime.append($distance);
+    $user.append($statusTime);
     //$user.append($actionButton);
     $user.append($locate);
     $user.append($nl2);
@@ -114,32 +143,41 @@ var createUserListItem = function(aUnit) {
     return $li;
 };
 
+var eventList = {};
+var unitList = {};
 
 $(document).ready(function() {
     $events = $('#eventList');
     $units = $('#unitList');
 
     registerConsumer('event-service', function(service) {
-        socket = io.connect(service.url);
-        socket.on('connect', function () {
+        eventSocket = io.connect(service.url);
+        eventSocket.on('connect', function () {
             $events.empty();
         });
-        socket.on('event', function (event) {
-            $events.append(createCaseListItem(event));
+        eventSocket.on('event', function (event) {
+            var oldEvent = eventList[event.id];
+
+            eventList[event.id] = event;
+            event.div = createCaseListItem(event);
+            if (oldEvent) {
+                $(oldEvent.div.id).replaceWith(event.div);
+            } else {
+                $events.append(event.div);
+            }
         });
     });
 
     registerConsumer('resource-service', function(service) {
-        socket = io.connect(service.url);
-        socket.on('connect', function () {
+        resourceSocket = io.connect(service.url);
+        resourceSocket.on('connect', function () {
             console.log("Connected to resource service");
-            $units.empty();
         });
-        socket.on('resourcesUpdated', function (resources) {
+        resourceSocket.on('resourcesUpdated', function (resources) {
             var ambulances = resources.filter(function(resource) {return resource.type == 'A';});
             console.log("Received", resources.length, "resources found", ambulances.length, "ambulances.")
-            ambulances.forEach(function(ambulance){
-                $units.append(createUserListItem(ambulance));
+            ambulances.forEach(function(ambulance) {
+                unitList[ambulance.id] = ambulance;
             });
         });
     });

@@ -109,7 +109,7 @@
 **********************************************/
 
 #unit-list  {
-    width:175px;
+    width:240px;
     float:left;
     left: 410px;
     position: absolute;
@@ -124,20 +124,27 @@
     list-style-type: none;
     margin:0;
     padding:0;
-    width:160px;
+    width:245px;
     float:left;
 }
 
 #unit-list li {
     height:30px;
-    width:145px;
+    width:225px;
+    margin: 0 0 2px 2px;
 }
 
 #unit-list ul li .unit {
     height:25px;
     padding: 4px;
-    width:140px;
+    width:220px;
     margin:0;
+}
+
+#unit-list .distance {
+    float:right;
+    margin:0;
+    font-weight:lighter;
 }
 
 #unit-list ul li .status {
