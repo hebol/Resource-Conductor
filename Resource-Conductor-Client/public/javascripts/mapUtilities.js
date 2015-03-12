@@ -55,7 +55,17 @@ var createOrUpdateMarker = function(object, title, infoText, type) {
     var marker = mapMarkers[type + object.id];
 
     if (!marker) {
-        marker = new google.maps.Marker({position: pos, map: map});
+        var anchor = (title.length * 7) / 2;
+
+        marker = new MarkerWithLabel({
+            position:     pos,
+            draggable:    false,
+            map:          map,
+            labelContent: title,
+            labelAnchor:  new google.maps.Point(anchor, 0),
+            labelClass:   "labels",
+            labelStyle:   {opacity: 0.75}
+        });
 
         if (infoText) {
             if (marker.hasOwnProperty('infoListener')) {
@@ -76,7 +86,6 @@ var createOrUpdateMarker = function(object, title, infoText, type) {
 
     // Add marker to cache
     mapMarkers[type + object.id] = marker;
-    //console.log("added marker: " + title + " (id=" +object.id + ") at " + pos);
 
     return marker;
 };

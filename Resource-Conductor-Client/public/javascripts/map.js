@@ -29,7 +29,7 @@ $(document).ready(function() {
             eventSocket = io.connect(service.url);
             eventSocket.on('event', function (data) {
                 console.log(data);
-                createOrUpdateMarker(data,  "Event-" + data.id, data.address, "event");
+                createOrUpdateMarker(data,  data.index, data.address, "event");
             });
         });
     }
