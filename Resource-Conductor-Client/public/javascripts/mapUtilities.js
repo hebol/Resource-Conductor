@@ -64,7 +64,7 @@ var createOrUpdateMarker = function(object, title, infoText, type) {
             labelContent: title,
             labelAnchor:  new google.maps.Point(anchor, 0),
             labelClass:   "labels",
-            labelStyle:   {opacity: 0.75}
+            labelStyle:   {opacity: 1.0}
         });
 
         if (infoText) {

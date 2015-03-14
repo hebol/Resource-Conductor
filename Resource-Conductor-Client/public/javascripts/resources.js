@@ -10,16 +10,23 @@ function toList(aMap) {
     return result;
 }
 
-
+var selectedCase = null;
 var createCaseListItem = function(myCase) {
     var getStatusColor = function() {
-        return 'light-grey-gradient';
+        return 'none';
     };
     var getSortValue = function (anEvent) {
         return anEvent.prio + "." + (1 - ("0." + new Date(anEvent.time).getTime()));
     };
-    var $li       = $('<li>', {class:getStatusColor(), id:'event-'+myCase.id, sortvalue: getSortValue(myCase)});
+    var id        = 'event-'+myCase.id;
+    var $li       = $('<li>', {class:getStatusColor(), id:id, sortvalue: getSortValue(myCase)});
     var $case     = $('<div>', {class:'case'}).on("click",function() {
+
+        if (selectedCase !== null) {
+            $("#"+selectedCase).toggleClass("selected-case");
+        }
+        selectedCase = myCase.div[0].id;
+        $("#"+selectedCase).toggleClass("selected-case");
         setSelectedCase(myCase);
     });
 
@@ -76,12 +83,13 @@ var calculateDistance = function (aUnit, anEvent) {
 };
 
 var assignResourceToCase = function (aUnit, anEvent) {
+    console.log(aUnit);
     resourceSocket.emit('assignResourceToCase', aUnit.id, anEvent.id);
 };
 
 var createUnitListItem = function(aUnit, anEvent) {
     var getStatusColor = function() {
-        return 'light-blue-gradient';
+        return 'none';
     };
 
     var distance = calculateDistance(aUnit, anEvent);
@@ -91,11 +99,13 @@ var createUnitListItem = function(aUnit, anEvent) {
     });
     var $nl1       = $('<br/>');
     var $nl2       = $('<br/>');
-    //var $nl3       = $('<br/>');
 
     var $status  = $('<div>', {class:'status'});
-
-    switch (aUnit.status) {
+    console.log(aUnit);
+    switch (aUnit.type) {
+        case "A":
+            $status  = $('<div>', {class:'status available', text:'A'});
+            break;
         case "K":
             $status  = $('<div>', {class:'status available', text:'T'});
             break;
@@ -121,9 +131,10 @@ var createUnitListItem = function(aUnit, anEvent) {
             break;
     }
 
-    var $name       = $('<div>', {class:'unitName',    text:aUnit.name});
+    var $name       = $('<div>', {class:'unitName',  text:aUnit.name});
     var $statusTime = $('<div>', {class:'w-title',   text:""});
-    var $distance    = $('<div>', {class:'distance',  text:distance + " km"});
+    var $distance   = $('<div>', {class:'distance',  text:distance + " km"});
+
     var $locate     = $('<i>',   {class:'locate fa fa-male fa-2x'}).on('click', function() {
         panMapToUser(aUnit);
     });
@@ -135,7 +146,7 @@ var createUnitListItem = function(aUnit, anEvent) {
     $statusTime.append($distance);
     $user.append($statusTime);
     //$user.append($actionButton);
-    $user.append($locate);
+    //$user.append($locate);
     $user.append($nl2);
 
     $li.append($user);

@@ -2,12 +2,11 @@
 <html>
     <head>
         <title><%= title %></title>
-
+        <link rel='stylesheet' href='/stylesheets/reset.css' />
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
         <link rel='stylesheet' href='/stylesheets/style.css' />
-        <link rel='stylesheet' href='/stylesheets/gradients.css' />
-        <link rel='stylesheet' href='/stylesheets/resources.css' />
         <link rel='stylesheet' href='/stylesheets/menu.css' />
+        <link rel='stylesheet' href='/stylesheets/resources.css' />
         <link rel="stylesheet" href="//code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css">
         <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.5/css/jquery.dataTables.css">
 
@@ -28,12 +27,6 @@
         <script type="text/javascript" src="/javascripts/mapUtilities.js"></script>
         <script type="text/javascript" src="/javascripts/map.js"></script>
         <script type="text/javascript" src="/javascripts/time.js"></script>
-        <style>
-            .selectable .ui-selecting { background: #FECA40; }
-            .selectable .ui-selected { background: #F39814; color: white; }
-            .selectable { list-style-type: none; margin: 0; padding: 0; width: 450px; }
-            .selectable li { margin: 3px; padding: 1px; float: left; width: 100px; height: 80px; text-align: center; }
-        </style>
     </head>
   <body>
 
@@ -84,16 +77,14 @@
     </div>
 
     <!-- +++++++++++++++++++++++ RESOURCE MANAGEMENT ++++++++++++++++++++++++ -->
-    <div id="resource-management" style="display: none">
-        <div id="case-list">
-            <div class="header">Events</div>
-            <ul id="eventList" class="selectable">
+    <div id="resource-management" style="display: block">
+        <div id="case-list" style="width: 365px;overflow:hidden">
+            <ul id="eventList">
                 <li>Waiting for event service to connect...</li>
             </ul>
         </div>
-        <div id="unit-list">
-            <div class="header">Units</div>
-            <ul id="unitList" class="selectable">
+        <div id="unit-list" style="width: 365px">
+            <ul id="unitList">
             </ul>
         </div>
     </div>

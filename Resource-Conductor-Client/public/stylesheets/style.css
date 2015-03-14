@@ -30,7 +30,7 @@ h1 {
     right:      15px;
     top:        10px;
     z-index:    100;
-    background: rgba(80, 80, 80, 0.5);
+    background: rgba(0, 0, 0, 0.5);
     color:      #fff;
     padding:    5px 3px 3px 3px;
 }
@@ -50,7 +50,7 @@ h1 {
     top:        10px;
     width:      315px;
     height:     182px;
-    background: #555;
+    background: #000;
     color:      #fff;
     padding:    10px 8px 8px 8px;
     border:     1px solid #222;
@@ -150,22 +150,22 @@ tbody {
 
 #resource-management {
     position:   absolute;
-    background: #999;
-    border:     1px solid #222;
+    background: transparent;
     color:      #fff;
     top:        10px;
     left:       160px;
     overflow:   auto;
     padding:    10px;
     margin:     0;
-    width:      60%;
-    height:     90%;
+    width:      800px;
+    height:     inherit;
+    max-height: 700px;
     z-index:    80;
 }
 
 .labels {
-    color:            red;
-    background-color: white;
+    color:            #f00;
+    background-color: #fff;
     font-family:      monospace;
     font-size:        10px;
     font-weight:      bold;
