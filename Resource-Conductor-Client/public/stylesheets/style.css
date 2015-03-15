@@ -148,17 +148,26 @@ tbody {
     color: #000;
 }
 
-#resource-management {
+#case-list {
     position:   absolute;
-    background: transparent;
     color:      #fff;
     top:        10px;
     left:       160px;
     overflow:   auto;
     padding:    10px;
     margin:     0;
-    width:      800px;
-    height:     inherit;
+    max-height: 700px;
+    z-index:    80;
+}
+
+#unit-list {
+    position:   absolute;
+    color:      #fff;
+    top:        10px;
+    left:       560px;
+    overflow:   auto;
+    padding:    10px;
+    margin:     0;
     max-height: 700px;
     z-index:    80;
 }

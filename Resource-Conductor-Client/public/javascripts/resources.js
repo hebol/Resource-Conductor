@@ -83,7 +83,6 @@ var calculateDistance = function (aUnit, anEvent) {
 };
 
 var assignResourceToCase = function (aUnit, anEvent) {
-    console.log(aUnit);
     resourceSocket.emit('assignResourceToCase', aUnit.id, anEvent.id);
 };
 

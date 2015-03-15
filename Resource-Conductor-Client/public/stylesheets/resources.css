@@ -11,14 +11,6 @@
     border-color:     #000;
 }
 
-#case-list {
-    float:    left;
-    z-index:  99;
-    position: absolute;
-    left:     10px;
-    top:      10px;
-}
-
 #case-list ul {
     max-height:      365px;
     overflow:        auto;
@@ -51,13 +43,16 @@
     border:     1px solid #000;
     color:      #000;
     background: rgba(255, 255, 255, 0.9);
-    font-size:  24px;
+    font-size:  32px;
     text-align: center;
     width:      32px;
     height:     32px;
     margin:     0;
     float:      left;
 }
+#case-list ul li .case .case-type {
+}
+
 
 #case-list ul li i {
     padding-right:5px;
@@ -118,15 +113,17 @@
 	UNIT LIST CONTAINER
 **********************************************/
 
-#unit-list  {
-    width:365px;
+
+/*#unit-list  {
+    width:385px;
     float:left;
     left: 410px;
     position: absolute;
     top:10px;
-    /*display:none;*/
+
 }
 
+*/
 #unit-list ul {
     max-height:      645px;
     overflow:        auto;
@@ -166,7 +163,7 @@
     float: left;
     text-align: center;
     color: #000;
-    font-size: 16px;
+    font-size: 20px;
 }
 
 #unit-list ul li .status.available {
