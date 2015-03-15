@@ -49,7 +49,7 @@
         <a href="#" onclick="$('#map-canvas').toggle();" class="menu-item">
             <i class="fa fa-map-marker menu-symbol"><br><span class="caption">map</span></i>
         </a>
-        <a href="#" onclick="$('#resource-management').toggle();" class="menu-item">
+        <a href="#" onclick="$('#case-list').toggle();$('#unit-list').toggle();" class="menu-item">
             <i class="fa fa-ambulance menu-symbol"><br><span class="caption">resources</span></i>
         </a>
         <a href="#" onclick="$('#report').toggle();" class="menu-item">
@@ -77,12 +77,12 @@
     </div>
 
     <!-- +++++++++++++++++++++++ RESOURCE MANAGEMENT ++++++++++++++++++++++++ -->
-    <div id="case-list" style="width: 365px;overflow:hidden;display:block">
+    <div id="case-list" style="width: 365px;overflow:hidden;display:none">
         <ul id="eventList">
             <li>Waiting for event service to connect...</li>
         </ul>
     </div>
-    <div id="unit-list" style="width: 365px;display:block">
+    <div id="unit-list" style="width: 365px;display:none">
         <ul id="unitList" style="width:320px">
         </ul>
     </div>

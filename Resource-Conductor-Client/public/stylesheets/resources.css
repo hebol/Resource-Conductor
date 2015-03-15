@@ -113,17 +113,6 @@
 	UNIT LIST CONTAINER
 **********************************************/
 
-
-/*#unit-list  {
-    width:385px;
-    float:left;
-    left: 410px;
-    position: absolute;
-    top:10px;
-
-}
-
-*/
 #unit-list ul {
     max-height:      645px;
     overflow:        auto;
