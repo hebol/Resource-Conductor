@@ -11,9 +11,8 @@ console.log("Has started server on port", port);
 var consumer = require('../Common/js/serviceConsumer')('time-service', process.title,
     {
         'time': processTimeEvent
-    }
+    }, true
 );
-consumer.autoConnect();
 
 var lastTime;
 var eventList = [];

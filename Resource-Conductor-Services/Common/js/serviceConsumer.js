@@ -1,17 +1,11 @@
 var config = require('./configService.js');
-module.exports = function(serviceType, systemName, receiveMap) {
+module.exports = function(serviceType, systemName, receiveMap, doAutoConnect) {
     var connectedSockets = {};
     var disconnectedSockets = {};
     var receiveData = receiveMap;
     var result = {
         isConnected: function() {
             return Object.keys(connectedSockets).length > 0;
-        },
-        autoConnect: function() {
-            config.registerServiceDiscovery(function(list) {
-                console.log("Got list of", list.length, "services");
-                list.forEach(result.connectToService);
-            });
         },
         connectToService: function(service, callback) {
             console.log("Asked to connect to service of type", service.serviceType, "URL", service.url);
@@ -46,9 +40,10 @@ module.exports = function(serviceType, systemName, receiveMap) {
             }
         },
 
-        emit: function(message, callback) {
+        emit: function(message, callback, arg1, arg2, arg3, arg4, arg5) {
+            //console.log("emit(", "message", message, "callback", callback, "arg1", arg1, "arg2", arg2, "arg3", arg3);
             for (var id in connectedSockets) {
-                connectedSockets[id].emit(message, callback);
+                connectedSockets[id].emit(message, arg1, arg2, arg3, arg4, arg5);
             }
         },
 
@@ -63,7 +58,14 @@ module.exports = function(serviceType, systemName, receiveMap) {
         }
     };
     config.setup(systemName);
-    config.registerConsumer([serviceType], result.connectToService, result.disconnectFromService);
+    var autoConnectFunction;
+    if (doAutoConnect) {
+        autoConnectFunction = function(list) {
+            console.log("Got list of", list.length, "services");
+            list.forEach(result.connectToService);
+        };
+    }
+    config.registerConsumer([serviceType], result.connectToService, result.disconnectFromService, autoConnectFunction);
     return result;
 };
 

@@ -1,14 +1,13 @@
 var srSocket = require('socket.io-client')('ws://localhost:1234');
+var consumerList = [];
 var registeredServices = {};
 var connectedToServices = {};
-var consumerConnectCallback;
-var consumerDisconnectCallback;
-var consumerTypes = [];
+
 var componentName;
 var hostIp = 'localhost';
 
 var uuid = require('node-uuid');
-var hasRegisteredConfig = false, serviceDiscoveryCallback;
+var hasRegisteredConfig = false;
 
 function toList(object) {
    var result = [];
@@ -28,14 +27,12 @@ srSocket.on('connect', function() {
 });
 
 srSocket.on('updatedServiceList', function(list) {
-    var filteredList = toList(list).filter(function(service){ return consumerTypes.indexOf(service.serviceType) >= 0;});
-    console.log('Received list of', Object.keys(list).length, 'services => filtered', filteredList.length);
-    serviceDiscoveryCallback && serviceDiscoveryCallback(filteredList);
+    consumerList.forEach(function(consumer){
+        var filteredList = toList(list).filter(function(service){ return consumer.consumerTypes.indexOf(service.serviceType) >= 0;});
+        console.log('Received list of', Object.keys(list).length, 'services => filtered', filteredList.length);
+        consumer.serviceDiscoveryCallback && consumer.serviceDiscoveryCallback(filteredList);
+    });
 });
-
-module.exports.registerServiceDiscovery = function(callback) {
-    serviceDiscoveryCallback = callback;
-};
 
 module.exports.setup = function(aName) {
     console.log("Setting up system", aName);
@@ -56,11 +53,31 @@ module.exports.registerService = function(port, serviceType) {
     console.log('Will register service:', registeredServices[id].serviceType);
 };
 
-module.exports.registerConsumer = function(typeList, connectCallback, disconnectCallback) {
-    consumerConnectCallback = connectCallback;
-    consumerDisconnectCallback = disconnectCallback;
-    consumerTypes = typeList;
+module.exports.registerConsumer = function(typeList, connectCallback, disconnectCallback, serviceDiscoveryCallback) {
+    consumerList.push({
+        consumerConnectCallback   : connectCallback,
+        consumerDisconnectCallback: disconnectCallback,
+        consumerTypes             : typeList,
+        serviceDiscoveryCallback  : serviceDiscoveryCallback
+    });
 };
+
+function findConsumer(serviceType) {
+    for (var index = 0 ; index < consumerList.length ; index++) {
+        var consumer = consumerList[index];
+        if (consumer.consumerTypes.indexOf(serviceType) >= 0) {
+            return consumer;
+        }
+    }
+}
+
+function getAllConsumerTypes() {
+    var result = [];
+    for (var index = 0 ; index < consumerList.length ; index++) {
+        result = result.concat(consumerList[index].consumerTypes);
+    }
+    return result;
+}
 
 var setupConfigService = function() {
     hasRegisteredConfig = true;
@@ -77,7 +94,7 @@ var setupConfigService = function() {
         aSocket.on('getSystemMetadata', function () {
             var data = {
                 producedServices: toList(registeredServices),
-                canConsume: consumerTypes,
+                canConsume: getAllConsumerTypes(),
                 connectedTo: connectedToServices
             };
             console.log("Transmitting metadata", data);
@@ -87,19 +104,25 @@ var setupConfigService = function() {
         aSocket.on('connectTo', function (service) {
             console.log('asked to connect to', service);
             connectedToServices[service.serviceId] = service;
-            consumerConnectCallback && consumerConnectCallback(service, function(status) {
-                console.log('Reply from connect was', status, "now connected to", connectedToServices);
-                aSocket.emit('connectStatus', status);
-            });
-            !consumerConnectCallback && aSocket.emit('connectStatus', false);
+            var consumer = findConsumer(service.serviceType);
+            if (consumer) {
+                consumer.consumerConnectCallback && consumer.consumerConnectCallback(service, function(status) {
+                    console.log('Reply from connect was', status, "now connected to", connectedToServices);
+                    aSocket.emit('connectStatus', status);
+                });
+                !consumer.consumerConnectCallback && aSocket.emit('connectStatus', false);
+            }
         });
 
         aSocket.on('disconnectAll', function () {
             console.log('asked to disconnect all');
             for (var serviceId in connectedToServices) {
                 var service = connectedToServices[serviceId];
-                consumerDisconnectCallback && consumerDisconnectCallback(service);
-                connectedToServices[serviceId] = null;
+                var consumer = findConsumer(service.serviceType);
+                if (consumer) {
+                    consumer.consumerDisconnectCallback && consumer.consumerDisconnectCallback(service);
+                    connectedToServices[serviceId] = null;
+                }
             }
             aSocket.emit('connectStatus', true);
         });
@@ -107,7 +130,10 @@ var setupConfigService = function() {
         aSocket.on('disconnectFrom', function (serviceId) {
             console.log('asked to disconnect from', serviceId);
             var service = connectedToServices[serviceId];
-            consumerDisconnectCallback && consumerDisconnectCallback(service);
+            var consumer = findConsumer(service.serviceType);
+            if (consumer) {
+                consumer.consumerDisconnectCallback && consumer.consumerDisconnectCallback(service);
+            }
 
             connectedToServices[serviceId] = null;
         });

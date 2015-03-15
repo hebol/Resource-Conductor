@@ -9,4 +9,6 @@ sleep 1
 newtab eval "Event   ; cd `dirname $0` ; cd Resource-Conductor-Services/Event-Simulator-Service     ; nodemon app.js"
 sleep 1
 newtab eval "Resource; cd `dirname $0` ; cd Resource-Conductor-Services/Resource-Management-Service ; nodemon app.js"
+sleep 1
+newtab eval "Route   ; cd `dirname $0` ; cd Resource-Conductor-Services/Route-Service               ; nodemon app.js"
 

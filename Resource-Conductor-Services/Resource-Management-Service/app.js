@@ -18,7 +18,9 @@ io.on('connection', function(socket) {
         console.log("Asked to assign resource", unitId, "to case", caseId);
         var aCase = events[caseId];
         aCase && (events[caseId].resource = unitId);
+        var unit = units[unitId];
         console.log("Should now find route to", aCase.latitude, aCase.longitude);
+        routeConsumer.emit('routeForId', function() {}, unit, aCase, unitId);
     });
 
 });
@@ -29,13 +31,23 @@ function processEvent(event) {
     events[event.id] = event;
 }
 
-var consumer = require('../Common/js/serviceConsumer')('event-service', process.title,
+var eventConsumer = require('../Common/js/serviceConsumer')('event-service', process.title,
     {
         'event': processEvent
-    }
+    },
+    true
 );
-consumer.autoConnect();
 
+function processRouteForId(id, route) {
+    console.log("Received route for id", id, "==>", route);
+}
+
+var routeConsumer = require('../Common/js/serviceConsumer')('route-service', process.title,
+    {
+        'routeForId': processRouteForId
+    },
+    true
+);
 
 var stations;
 var units;
