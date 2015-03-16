@@ -39,6 +39,7 @@ var stopTimeFunction = function() {
 };
 
 var setTimeFunction = function(time) {
+    console.log("New start time", time);
     startTime = new Date();
     timeReference = new Date(time);
     tick('set');

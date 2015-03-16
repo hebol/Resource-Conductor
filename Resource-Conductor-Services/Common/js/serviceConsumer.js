@@ -5,15 +5,21 @@ module.exports = function(serviceType, systemName, receiveMap, doAutoConnect) {
     var receiveData = receiveMap;
     var result = {
         isConnected: function() {
-            return Object.keys(connectedSockets).length > 0;
+            var isConnected = false;
+            Object.getOwnPropertyNames(connectedSockets).forEach(function(key){
+                if (connectedSockets[key].connected) {
+                    isConnected = true;
+                }
+            });
+            return isConnected;
         },
         connectToService: function(service, callback) {
             console.log("Asked to connect to service of type", service.serviceType, "URL", service.url);
             var socket = connectedSockets[service.serviceId];
             var registerFunction = function (aSocket, anId, serviceId) {
-                aSocket.on(anId, function(data, data2, data3) {
+                aSocket.on(anId, function(data1, data2, data3, data4, data5) {
                     if (connectedSockets[serviceId]) {
-                        receiveData && receiveData[anId] && receiveData[anId](data, data2, data3);
+                        receiveData && receiveData[anId] && receiveData[anId](data1, data2, data3, data4, data5);
                     }
                 });
             };
@@ -40,7 +46,7 @@ module.exports = function(serviceType, systemName, receiveMap, doAutoConnect) {
             }
         },
 
-        emit: function(message, callback, arg1, arg2, arg3, arg4, arg5) {
+        emit: function(message, arg1, arg2, arg3, arg4, arg5) {
             //console.log("emit(", "message", message, "callback", callback, "arg1", arg1, "arg2", arg2, "arg3", arg3);
             for (var id in connectedSockets) {
                 connectedSockets[id].emit(message, arg1, arg2, arg3, arg4, arg5);

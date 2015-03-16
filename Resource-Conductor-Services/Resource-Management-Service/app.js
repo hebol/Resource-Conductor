@@ -20,7 +20,7 @@ io.on('connection', function(socket) {
         aCase && (events[caseId].resource = unitId);
         var unit = units[unitId];
         console.log("Should now find route to", aCase.latitude, aCase.longitude);
-        routeConsumer.emit('routeForId', function() {}, unit, aCase, unitId);
+        routeConsumer.emit('getRouteForId', unit, aCase, unitId);
     });
 
 });
