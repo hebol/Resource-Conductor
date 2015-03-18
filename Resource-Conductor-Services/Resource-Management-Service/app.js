@@ -40,6 +40,7 @@ var eventConsumer = require('../Common/js/serviceConsumer')('event-service', pro
 
 function processRouteForId(id, route) {
     console.log("Received route for id", id, "==>", route);
+    console.log(JSON.stringify(route));
 }
 
 var routeConsumer = require('../Common/js/serviceConsumer')('route-service', process.title,
