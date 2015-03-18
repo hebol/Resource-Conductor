@@ -49,7 +49,8 @@ function processEvent(event) {
     events[event.id] = event;
 }
 
-var eventConsumer = require('../Common/js/serviceConsumer')('event-service', process.title,
+//var eventConsumer =
+    require('../Common/js/serviceConsumer')('event-service', process.title,
     {
         'event': processEvent
     },
@@ -96,9 +97,9 @@ var calculateStartPositions = function (unitList, stationList) {
 var readData = function (filename) {
     fs.readFile(filename, 'utf8', function (err, data) {
         if (err) { throw err;}
-        var data = JSON.parse(data);
+        data = JSON.parse(data);
 
-        carcounter = 0;
+        //carcounter = 0;
         stations = data.stations;
         units    = data.units;
         console.log("Has read data file", filename, stations.length, "stations and", units.length, "ambulances");
