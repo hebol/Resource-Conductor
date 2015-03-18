@@ -126,12 +126,9 @@ var createUnitListItem = function(aUnit, anEvent) {
 
     var $status  = $('<div>', {class:'status'});
     console.log(aUnit);
-    switch (aUnit.type) {
-        case "A":
-            $status  = $('<div>', {class:'status available', text:'A'});
-            break;
+    switch (aUnit.status) {
         case "K":
-            $status  = $('<div>', {class:'status available', text:'T'});
+            $status  = $('<div>', {class:'status available', text:'K'});
             break;
         case "T":
             $status  = $('<div>', {class:'status transport', text:'T'});
