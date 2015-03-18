@@ -9,18 +9,36 @@ console.log("Has started server on port", port);
 
 config.registerService(port, "resource-service");
 
+
+
 io.on('connection', function(socket) {
     console.log('client', socket.id, 'connecting');
     notifySubscribers(socket, stations);
     notifySubscribers(socket, units);
 
+
+    function getUnit(id) {
+        for (var i = 0; i < units.length; i++) {
+            if (units[i].id === id) {
+                return units[i];
+            }
+        }
+        return null;
+    }
     socket.on('assignResourceToCase', function(unitId, caseId) {
         console.log("Asked to assign resource", unitId, "to case", caseId);
         var aCase = events[caseId];
         aCase && (events[caseId].resource = unitId);
-        var unit = units[unitId];
-        console.log("Should now find route to", aCase.latitude, aCase.longitude);
-        routeConsumer.emit('getRouteForId', unit, aCase, unitId);
+        var unit = getUnit(unitId);
+
+        if (unit) {
+            //Temporary
+            unit.status = "U";
+            notifySubscribers(io.sockets, [unit]);
+
+            console.log("Should now find route to", aCase.latitude, aCase.longitude);
+            routeConsumer.emit('getRouteForId', unit, aCase, unitId);
+        }
     });
 
 });
@@ -50,8 +68,9 @@ var routeConsumer = require('../Common/js/serviceConsumer')('route-service', pro
     true
 );
 
-var stations;
-var units;
+var stations = [];
+var units    = [];
+
 
 var notifySubscribers = function (sockets, resources) {
     sockets.emit('resourcesUpdated', resources);
@@ -78,8 +97,10 @@ var readData = function (filename) {
     fs.readFile(filename, 'utf8', function (err, data) {
         if (err) { throw err;}
         var data = JSON.parse(data);
+
+        carcounter = 0;
         stations = data.stations;
-        units = data.units;
+        units    = data.units;
         console.log("Has read data file", filename, stations.length, "stations and", units.length, "ambulances");
         notifySubscribers(io.sockets, stations);
         calculateStartPositions(units, stations);
