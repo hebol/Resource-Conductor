@@ -128,6 +128,7 @@
     background-color: rgba(0, 0, 0, 0.4);
     margin:           0 0 3px 0;
     border:           1px solid #777;
+    cursor:           pointer;
 }
 
 #unit-list ul li .unit {
@@ -157,6 +158,10 @@
 
 #unit-list ul li .status.available {
     background-color: #0f0;
+}
+
+#unit-list ul li .status.accepted {
+    background-color: #00f;
 }
 
 #unit-list ul li .unitName {
@@ -190,7 +195,7 @@
     background-color: #fff;
 }
 
-#unit-list ul li.selected-case {
+#unit-list ul li.selected-unit {
     background-color: rgba(0, 170, 255, 0.6);
     border-color:     #000;
 }

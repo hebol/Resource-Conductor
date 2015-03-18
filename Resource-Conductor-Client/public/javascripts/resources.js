@@ -14,7 +14,7 @@ var selectedCase = null;
 
 var clearSelectedUnits = function() {
     if (selectedUnit !== null) {
-        $("#"+selectedUnit).toggleClass("selected-unit");
+        $("#unit-"+selectedUnit).toggleClass("selected-unit");
     }
     selectedUnit = null;
 };
@@ -112,20 +112,21 @@ var createUnitListItem = function(aUnit, anEvent) {
     var distance = calculateDistance(aUnit, anEvent);
     var $li       = $('<li>', {class:getStatusColor(), id:'unit-'+aUnit.id, distance: distance});
     var $unit = $('<div>', {class:'unit'}).on("click",function() {
+        if (aUnit.status === "K") {
+            if (selectedUnit !== null) {
+                $("#unit-"+selectedUnit).toggleClass("selected-unit");
+            }
+            selectedUnit = aUnit.id;
+            $("#unit-"+selectedUnit).toggleClass("selected-unit");
 
-        if (selectedUnit !== null) {
-            $("#unit-"+selectedUnit).toggleClass("selected-case");
+            assignResourceToCase(aUnit, anEvent);
         }
-        selectedUnit = aUnit.id;
-        $("#unit-"+selectedUnit).toggleClass("selected-case ");
-
-        assignResourceToCase(aUnit, anEvent);
     });
     var $nl1       = $('<br/>');
     var $nl2       = $('<br/>');
 
     var $status  = $('<div>', {class:'status'});
-    console.log(aUnit);
+    //console.log(aUnit);
     switch (aUnit.status) {
         case "K":
             $status  = $('<div>', {class:'status available', text:'K'});
@@ -206,9 +207,19 @@ $(document).ready(function() {
             console.log("Connected to resource service");
         });
         resourceSocket.on('resourcesUpdated', function (resources) {
+            console.log(resources);
             var ambulances = resources.filter(function(resource) {return resource.type == 'A';});
             console.log("Received", resources.length, "resources found", ambulances.length, "ambulances.")
             ambulances.forEach(function(ambulance) {
+                if (selectedUnit === ambulance.id && ambulance.status !== "A") {
+                    clearSelectedUnits();
+                }
+
+                if (selectedCase != null) {
+                    var $unitDiv = createUnitListItem(ambulance, selectedCase);
+                    $("#unit-"+ambulance.id).replaceWith($unitDiv);
+                }
+
                 unitList[ambulance.id] = ambulance;
             });
         });
