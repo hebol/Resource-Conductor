@@ -31,6 +31,10 @@ var initMap = function(latitude, longitude) {
     map = map || new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
 };
 
+var toPosition = function(latitude, longitude) {
+    return new google.maps.LatLng(latitude, longitude);
+}
+
 //---------------------------------------------------------------------------
 // Convert input to Google LatLong
 //---------------------------------------------------------------------------

@@ -41,6 +41,9 @@ var createCaseListItem = function(myCase) {
     $case.append($time1);
     $case.append($nl);
     $case.append($desc);
+    $case.on("click", function(){
+       panMapToObject(myCase);
+    });
 
     $li.append($case);
 
@@ -86,6 +89,13 @@ var assignResourceToCase = function (aUnit, anEvent) {
     resourceSocket.emit('assignResourceToCase', aUnit.id, anEvent.id);
 };
 
+var panMapToObject = function(obj, zoomLevel) {
+    map.panTo(toPosition(obj.latitude, obj.longitude));
+    if (zoomLevel) {
+        map.setZoom(zoomLevel);
+    }
+}
+
 var createUnitListItem = function(aUnit, anEvent) {
     var getStatusColor = function() {
         return 'none';
@@ -100,7 +110,7 @@ var createUnitListItem = function(aUnit, anEvent) {
     var $nl2       = $('<br/>');
 
     var $status  = $('<div>', {class:'status'});
-    console.log(aUnit);
+    //console.log(aUnit);
     switch (aUnit.type) {
         case "A":
             $status  = $('<div>', {class:'status available', text:'A'});
@@ -135,7 +145,7 @@ var createUnitListItem = function(aUnit, anEvent) {
     var $distance   = $('<div>', {class:'distance',  text:distance + " km"});
 
     var $locate     = $('<i>',   {class:'locate fa fa-male fa-2x'}).on('click', function() {
-        panMapToUser(aUnit);
+        panMapToObject(aUnit);
     });
 
     $user.append($status);
