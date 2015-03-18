@@ -11,6 +11,14 @@ function toList(aMap) {
 }
 
 var selectedCase = null;
+
+var clearSelectedUnits = function() {
+    if (selectedUnit !== null) {
+        $("#"+selectedUnit).toggleClass("selected-unit");
+    }
+    selectedUnit = null;
+};
+
 var createCaseListItem = function(myCase) {
     var getStatusColor = function() {
         return 'none';
@@ -18,10 +26,12 @@ var createCaseListItem = function(myCase) {
     var getSortValue = function (anEvent) {
         return anEvent.prio + "." + (1 - ("0." + new Date(anEvent.time).getTime()));
     };
-    var id        = 'event-'+myCase.id;
-    var $li       = $('<li>', {class:getStatusColor(), id:id, sortvalue: getSortValue(myCase)});
-    var $case     = $('<div>', {class:'case'}).on("click",function() {
 
+    var id    = 'event-'+myCase.id;
+    var $li   = $('<li>', {class:getStatusColor(), id:id, sortvalue: getSortValue(myCase)});
+    var $case = $('<div>', {class:'case'}).on("click",function() {
+        panMapToObject(myCase);
+        clearSelectedUnits();
         if (selectedCase !== null) {
             $("#"+selectedCase).toggleClass("selected-case");
         }
@@ -41,9 +51,6 @@ var createCaseListItem = function(myCase) {
     $case.append($time1);
     $case.append($nl);
     $case.append($desc);
-    $case.on("click", function(){
-       panMapToObject(myCase);
-    });
 
     $li.append($case);
 
@@ -61,7 +68,7 @@ var setSelectedCase = function (aCase) {
     listItems.sort(function(a, b) {
         return $(a).attr('distance') - $(b).attr('distance');
     });
-    $.each(listItems, function(idx, itm) { $units.append(itm);});
+    $.each(listItems, function(idx, itm) { $units.append(itm); });
 };
 
 function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
@@ -94,8 +101,9 @@ var panMapToObject = function(obj, zoomLevel) {
     if (zoomLevel) {
         map.setZoom(zoomLevel);
     }
-}
+};
 
+var selectedUnit = null;
 var createUnitListItem = function(aUnit, anEvent) {
     var getStatusColor = function() {
         return 'none';
@@ -103,14 +111,21 @@ var createUnitListItem = function(aUnit, anEvent) {
 
     var distance = calculateDistance(aUnit, anEvent);
     var $li       = $('<li>', {class:getStatusColor(), id:'unit-'+aUnit.id, distance: distance});
-    var $user = $('<div>', {class:'unit'}).on("click",function() {
+    var $unit = $('<div>', {class:'unit'}).on("click",function() {
+
+        if (selectedUnit !== null) {
+            $("#unit-"+selectedUnit).toggleClass("selected-case");
+        }
+        selectedUnit = aUnit.id;
+        $("#unit-"+selectedUnit).toggleClass("selected-case ");
+
         assignResourceToCase(aUnit, anEvent);
     });
     var $nl1       = $('<br/>');
     var $nl2       = $('<br/>');
 
     var $status  = $('<div>', {class:'status'});
-    //console.log(aUnit);
+    console.log(aUnit);
     switch (aUnit.type) {
         case "A":
             $status  = $('<div>', {class:'status available', text:'A'});
@@ -148,17 +163,17 @@ var createUnitListItem = function(aUnit, anEvent) {
         panMapToObject(aUnit);
     });
 
-    $user.append($status);
-    $user.append($name);
-    $user.append($nl1);
+    $unit.append($status);
+    $unit.append($name);
+    $unit.append($nl1);
     //$statusTime.append($nl3);
     $statusTime.append($distance);
-    $user.append($statusTime);
+    $unit.append($statusTime);
     //$user.append($actionButton);
     //$user.append($locate);
-    $user.append($nl2);
+    $unit.append($nl2);
 
-    $li.append($user);
+    $li.append($unit);
 
     return $li;
 };
