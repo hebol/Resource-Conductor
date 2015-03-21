@@ -117,15 +117,15 @@ var routeConsumer = require('../Common/js/serviceConsumer')('route-service', pro
 
 var currentTime;
 function moveUnitForTime(unit, time) {
-    console.log('unit', unit.name, unit.routing);
+    // console.log('unit', unit.name, unit.routing);
     var result = null;
     if (time) {
         var elapsedTime = (time.getTime() - unit.routing.startTime.getTime()) / 1000;
         if (elapsedTime > 0 && unit.routing.steps.length >= 0) {
             console.log('Will move', unit.name, 'steps(', unit.routing.steps.length, ')', elapsedTime);
-            for (var i = 0 ; i < unit.routing.steps.length ; i++) {
+            for (var i = unit.routing.steps.length - 1 ; i >= 0 ; i--) {
                 var aStep = unit.routing.steps[i];
-                if (elapsedTime < aStep.time) {
+                if (elapsedTime > aStep.time) {
                     console.log('Will move', unit.name, 'to', aStep);
 
                     unit.latitude = aStep.latitude;
