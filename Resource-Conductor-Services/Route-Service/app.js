@@ -3,7 +3,7 @@ process.title = 'route-system';
 var io = require('socket.io')(),
     config = require('../Common/js/configService.js');
 var gm = require('googlemaps');
-var fs = require('fs');
+var routeHandling = require('../Common/js/routeHandling.js');
 
 var port = io.listen(0).httpServer.address().port;
 
@@ -26,48 +26,19 @@ function toGooglePoint(point) {
     return point.latitude + ',' + point.longitude;
 }
 
-function dataFileExists(filename, callback) {
-    return fs.exists(filename, callback);
-}
-
-function loadDataFile(filename, callback) {
-    console.log('loading route file', filename);
-    fs.readFile(filename, 'utf8', function (err, data) {
-        if (err) {
-            throw err;
-        }
-        callback && callback(JSON.parse(data));
-    });
-}
-
-function writeDataFile(filename, route) {
-    fs.writeFile(filename, JSON.stringify(route));
-}
-
-function posToFilename(start, stop) {
-    function toFilename(pos1, pos2) {
-        return "routes/" + pos1.latitude + '_' + pos1.longitude + '_' + pos2.latitude + '_' + pos2.longitude + ".json";
-    }
-
-    if (start.latitude > stop.latitude || (start.latitude === stop.latitude && start.longitude > stop.longitude)) {
-        return toFilename(start, stop);
-    } else {
-        return toFilename(stop, start);
-    }
-}
 
 function calculateRoute(start, stop, callback) {
     var from = toGooglePoint(start);
     var to   = toGooglePoint(stop);
-    var filename = posToFilename(start, stop);
+    var filename = routeHandling.posToFilename(start, stop);
 
-    dataFileExists(filename, function(exists){
+    routeHandling.dataFileExists(filename, function(exists){
         if(exists) {
-            loadDataFile(filename, callback);
+            routeHandling.loadDataFile(filename, callback);
         } else {
             gm.directions(from, to, function(err, route) {
-                console.log("Has received from google", route, "(", err, ")");
-                writeDataFile(filename, route);
+                console.log("Has received ROUTE from google", route, "(", err, ")");
+                routeHandling.writeDataFile(filename, route);
                 callback && callback(route);
             });
         }
