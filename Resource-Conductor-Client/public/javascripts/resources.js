@@ -64,6 +64,8 @@ var setSelectedCase = function (aCase) {
         var hide = false;
         if (aCase.hasOwnProperty("resource")) {
             hide = (aCase.resource != unitId);
+        } else if (unit["status"] !== "K") {
+            hide = true;
         }
         $units.append(createUnitListItem(unit, aCase, hide));
     }
