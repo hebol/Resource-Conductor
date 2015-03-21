@@ -28,6 +28,7 @@ function assignUnitToCase(unitId, caseId) {
     if (unit) {
         //Temporary
         unit.status = "U";
+        aCase["resource"] = unitId;
         notifySubscribers(io.sockets, [unit]);
 
         routeConsumer.emit('getRouteForId', unit, aCase, unitId);

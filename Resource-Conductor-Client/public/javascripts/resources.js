@@ -61,7 +61,11 @@ var setSelectedCase = function (aCase) {
     $units.empty();
     for (var unitId in unitList) {
         var unit = unitList[unitId];
-        $units.append(createUnitListItem(unit, aCase));
+        var hide = false;
+        if (aCase.hasOwnProperty("resource")) {
+            hide = (aCase.resource != unitId);
+        }
+        $units.append(createUnitListItem(unit, aCase, hide));
     }
 
     var listItems = $units.children('li').get();
@@ -104,7 +108,7 @@ var panMapToObject = function(obj, zoomLevel) {
 };
 
 var selectedUnit = null;
-var createUnitListItem = function(aUnit, anEvent) {
+var createUnitListItem = function(aUnit, anEvent, hide) {
     var getStatusColor = function() {
         return 'none';
     };
@@ -172,6 +176,9 @@ var createUnitListItem = function(aUnit, anEvent) {
     $unit.append($nl2);
 
     $li.append($unit);
+    if (hide) {
+        $li.hide();
+    }
 
     return $li;
 };
