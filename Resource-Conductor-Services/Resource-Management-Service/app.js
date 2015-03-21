@@ -94,12 +94,58 @@ function investigateRoute(routes) {
 function processRouteForId(id, route) {
     console.log("Received route for id", id, "==>", route);
     //console.log(JSON.stringify(route));
-    investigateRoute(route.routes);
+    var steps = investigateRoute(route.routes);
+    getUnit(id).routing = {
+        steps: steps,
+        startTime: currentTime
+    };
 }
 
 var routeConsumer = require('../Common/js/serviceConsumer')('route-service', process.title,
     {
         'routeForId': processRouteForId
+    },
+    true
+);
+
+var currentTime;
+function moveUnitForTime(unit, time) {
+    var result = null;
+    var elapsedTime = time.getTime() - unit.routing.startTime.getTime();
+    if (time.getTime() > 0 && unit.routing.steps >= 0) {
+        for (var i = 0 ; i < unit.routing.steps.length ; i++) {
+            const step = unitv.routing.steps[i];
+            if (elapsedTime < step.startTime) {
+                unit.latitude = step.latitude;
+                unit.longitude = step.longitude;
+                result = unit;
+                if (i == unit.routing.steps.length - 1) {
+                    console.log('Vehicle', unit, 'moved to location');
+                    unit.routing = null;
+                }
+                break;
+            }
+        }
+    }
+    return result;
+}
+
+var processTime = function(time, type) {
+    currentTime = new Date(time);
+    var updated = [];
+    units.forEach(function(unit) {
+        var result = unit.routing && moveUnitForTime(unit, time);
+        result && updated.push(result);
+    });
+    if (updated.length > 0) {
+        notifySubscribers(io.sockets, updated);
+    }
+};
+
+//var timeConsumer =
+    require('../Common/js/serviceConsumer')('time-service', process.title,
+    {
+        'tick': processTime
     },
     true
 );
