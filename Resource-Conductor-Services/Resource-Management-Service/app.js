@@ -132,7 +132,7 @@ function moveUnitForTime(unit, time) {
                     unit.longitude = aStep.longitude;
                     result = unit;
                     if (i == unit.routing.steps.length - 1) {
-                        console.log('Vehicle', unit.name, 'moved to location');
+                        console.log('Vehicle', unit.name, 'moved to target location');
                         unit.routing = null;
                     }
                     break;
