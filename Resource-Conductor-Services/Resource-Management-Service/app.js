@@ -62,12 +62,12 @@ function processEvent(event) {
 
 var polyUtil = require('polyline-encoded');
 function investigateRoute(routes) {
+    var steps = [];
     routes.forEach(function(route) {
-        var steps = [];
-        console.log('There are', route.legs.length, 'parts');
+        //console.log('There are', route.legs.length, 'parts');
         var duration = 0, distance = 0;
         route.legs.forEach(function(leg) {
-            console.log('looking at', leg.start_address, 'to', leg.end_address);
+            //console.log('looking at', leg.start_address, 'to', leg.end_address);
             var partDur = 0;
             leg.steps.forEach(function(step) {
                 var positions = polyUtil.decode(step.polyline.points);
@@ -79,16 +79,16 @@ function investigateRoute(routes) {
                     };
                     steps.push(timedStep);
                 }
-                console.log('dist', step.distance.value, 'dur', step.duration.value, 'pos', positions.length);
+                //console.log('dist', step.distance.value, 'dur', step.duration.value, 'pos', positions.length);
                 partDur += step.duration.value;
             });
             duration += leg.duration.value;
             distance += leg.distance.value;
         });
         console.log('Total duration', duration, 'and length', distance);
-        steps.forEach(function(step) { console.log('step', step)});
-        return steps;
+        //steps.forEach(function(step) { console.log('step', step)});
     });
+    return steps;
 }
 
 function processRouteForId(id, route) {
@@ -111,30 +111,38 @@ var routeConsumer = require('../Common/js/serviceConsumer')('route-service', pro
 var currentTime;
 function moveUnitForTime(unit, time) {
     var result = null;
-    var elapsedTime = time.getTime() - unit.routing.startTime.getTime();
-    if (time.getTime() > 0 && unit.routing.steps >= 0) {
-        for (var i = 0 ; i < unit.routing.steps.length ; i++) {
-            const step = unitv.routing.steps[i];
-            if (elapsedTime < step.startTime) {
-                unit.latitude = step.latitude;
-                unit.longitude = step.longitude;
-                result = unit;
-                if (i == unit.routing.steps.length - 1) {
-                    console.log('Vehicle', unit, 'moved to location');
-                    unit.routing = null;
+    if (time) {
+        var elapsedTime = time.getTime() - unit.routing.startTime.getTime();
+        if (time.getTime() > 0 && unit.routing.steps >= 0) {
+            console.log('Will move', unit);
+            for (var i = 0 ; i < unit.routing.steps.length ; i++) {
+                const step = unit.routing.steps[i];
+                if (elapsedTime < step.startTime) {
+                    console.log('Will move', unit, 'to', step);
+
+                    unit.latitude = step.latitude;
+                    unit.longitude = step.longitude;
+                    result = unit;
+                    if (i == unit.routing.steps.length - 1) {
+                        console.log('Vehicle', unit, 'moved to location');
+                        unit.routing = null;
+                    }
+                    break;
                 }
-                break;
             }
+        } else {
+            console.log('Unit', unit, 'is out of time');
         }
     }
     return result;
 }
 
 var processTime = function(time, type) {
+    console.log('processing time', time, type);
     currentTime = new Date(time);
     var updated = [];
     units.forEach(function(unit) {
-        var result = unit.routing && moveUnitForTime(unit, time);
+        var result = unit.routing && moveUnitForTime(unit, currentTime);
         result && updated.push(result);
     });
     if (updated.length > 0) {
@@ -145,7 +153,7 @@ var processTime = function(time, type) {
 //var timeConsumer =
     require('../Common/js/serviceConsumer')('time-service', process.title,
     {
-        'tick': processTime
+        'time': processTime
     },
     true
 );
