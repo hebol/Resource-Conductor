@@ -71,9 +71,12 @@ function investigateRoute(routes) {
             var partDur = 0;
             leg.steps.forEach(function(step) {
                 var positions = polyUtil.decode(step.polyline.points);
+                console.log('working with', step, duration,partDur);
                 for (var i = 0 ; i < positions.length - 1 ; i++) {
+                    var calcDur = duration + partDur + (i * step.duration.value) / positions.length;
+                    //console.log('dur', duration, 'part:', partDur, 'i', i, 'posLen:', positions.length, '=>', calcDur)
                     var timedStep = {
-                        startTime: duration + partDur + (i * step.duration.value) / positions.length,
+                        time: calcDur,
                         latitude: positions[i][0],
                         longitude:  positions[i][1]
                     };
@@ -111,18 +114,19 @@ var routeConsumer = require('../Common/js/serviceConsumer')('route-service', pro
 
 var currentTime;
 function moveUnitForTime(unit, time) {
+    console.log('unit', unit.name, unit.routing);
     var result = null;
     if (time) {
-        var elapsedTime = time.getTime() - unit.routing.startTime.getTime();
+        var elapsedTime = (time.getTime() - unit.routing.startTime.getTime()) / 1000;
         if (elapsedTime > 0 && unit.routing.steps.length >= 0) {
-            console.log('Will move', unit.name, 'steps(', unit.routing.steps.length, ')');
+            console.log('Will move', unit.name, 'steps(', unit.routing.steps.length, ')', elapsedTime);
             for (var i = 0 ; i < unit.routing.steps.length ; i++) {
-                const step = unit.routing.steps[i];
-                if (elapsedTime < step.startTime) {
-                    console.log('Will move', unit.name, 'to', step);
+                var aStep = unit.routing.steps[i];
+                if (elapsedTime < aStep.time) {
+                    console.log('Will move', unit.name, 'to', aStep);
 
-                    unit.latitude = step.latitude;
-                    unit.longitude = step.longitude;
+                    unit.latitude = aStep.latitude;
+                    unit.longitude = aStep.longitude;
                     result = unit;
                     if (i == unit.routing.steps.length - 1) {
                         console.log('Vehicle', unit.name, 'moved to location');
