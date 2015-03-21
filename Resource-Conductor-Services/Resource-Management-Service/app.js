@@ -99,6 +99,7 @@ function processRouteForId(id, route) {
         steps: steps,
         startTime: currentTime
     };
+    console.log('assigning', id, 'at', currentTime, currentTime.getTime());
 }
 
 var routeConsumer = require('../Common/js/serviceConsumer')('route-service', process.title,
@@ -113,33 +114,33 @@ function moveUnitForTime(unit, time) {
     var result = null;
     if (time) {
         var elapsedTime = time.getTime() - unit.routing.startTime.getTime();
-        if (time.getTime() > 0 && unit.routing.steps >= 0) {
-            console.log('Will move', unit);
+        if (elapsedTime > 0 && unit.routing.steps.length >= 0) {
+            console.log('Will move', unit.name, 'steps(', unit.routing.steps.length, ')');
             for (var i = 0 ; i < unit.routing.steps.length ; i++) {
                 const step = unit.routing.steps[i];
                 if (elapsedTime < step.startTime) {
-                    console.log('Will move', unit, 'to', step);
+                    console.log('Will move', unit.name, 'to', step);
 
                     unit.latitude = step.latitude;
                     unit.longitude = step.longitude;
                     result = unit;
                     if (i == unit.routing.steps.length - 1) {
-                        console.log('Vehicle', unit, 'moved to location');
+                        console.log('Vehicle', unit.name, 'moved to location');
                         unit.routing = null;
                     }
                     break;
                 }
             }
         } else {
-            console.log('Unit', unit, 'is out of time');
+            console.log('Unit', unit.name, 'is out of time');
         }
     }
     return result;
 }
 
 var processTime = function(time, type) {
-    console.log('processing time', time, type);
     currentTime = new Date(time);
+    console.log('processing time', currentTime, type, currentTime.getTime());
     var updated = [];
     units.forEach(function(unit) {
         var result = unit.routing && moveUnitForTime(unit, currentTime);
