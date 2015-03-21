@@ -36,11 +36,7 @@ module.exports = {
             return routeDir + '/' + pos1.latitude + '_' + pos1.longitude + '_' + pos2.latitude + '_' + pos2.longitude + ".json";
         }
 
-        if (start.latitude > stop.latitude || (start.latitude === stop.latitude && start.longitude > stop.longitude)) {
-            return toFilename(start, stop);
-        } else {
-            return toFilename(stop, start);
-        }
+        return toFilename(start, stop);
     }
 
 };
