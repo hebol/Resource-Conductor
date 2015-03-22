@@ -59,9 +59,9 @@ var readEvents = function (filename) {
         console.log("Has read data file", data);
         if (err) throw err;
         var data = JSON.parse(data);
+        setStartTime( new Date(data.startTime));
         eventList = data.eventList;
         eventList.forEach(function(event){ event.time = new Date(event.time);});
-        setStartTime( new Date(data.startTime));
     });
 };
 

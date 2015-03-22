@@ -2,13 +2,20 @@ process.title = 'resource-system';
 
 var io = require('socket.io')(),
     config = require('../Common/js/configService.js'),
-    routeHandling = require('../Common/js/routeHandling.js'),
+    model = require('../Common/js/model.js'),
     fs = require('fs');
 
 var port = io.listen(0).httpServer.address().port;
 console.log("Has started server on port", port);
 
 config.registerService(port, "resource-service");
+
+var stations;
+var units;
+
+var hasReadData = function() {
+    return units;
+};
 
 var getUnit = function (id) {
     for (var i = 0; i < units.length; i++) {
@@ -27,13 +34,11 @@ function assignUnitToCase(unitId, caseId) {
 
     if (unit) {
         //Temporary
-        unit.status = 'U';
         aCase['resource'] = unitId;
         aCase['status'] = 'U';
+        unit.goToCase(aCase, currentTime);
         notifySubscribers(io.sockets, [unit]);
         notifySubscribers(io.sockets, [aCase]);
-
-        routeConsumer.emit('getRouteForId', unit, aCase, unitId);
     }
 }
 
@@ -63,60 +68,15 @@ function processEvent(event) {
     true
 );
 
-function processRouteForId(id, route) {
-    console.log("Received route for id", id, "==>", route);
-    //console.log(JSON.stringify(route));
-    var steps = routeHandling.convertGoogleRoute(route.routes);
-    getUnit(id).routing = {
-        steps: steps,
-        startTime: currentTime
-    };
-    console.log('assigning', id, 'at', currentTime, currentTime.getTime());
-}
-
-var routeConsumer = require('../Common/js/serviceConsumer')('route-service', process.title,
-    {
-        'routeForId': processRouteForId
-    },
-    true
-);
-
 var currentTime;
-function moveUnitForTime(unit, time) {
-    // console.log('unit', unit.name, unit.routing);
-    var result = null;
-    if (time) {
-        var elapsedTime = (time.getTime() - unit.routing.startTime.getTime()) / 1000;
-        if (elapsedTime > 0 && unit.routing.steps.length >= 0) {
-            console.log('Will move', unit.name, 'steps(', unit.routing.steps.length, ')', elapsedTime);
-            for (var i = unit.routing.steps.length - 1 ; i >= 0 ; i--) {
-                var aStep = unit.routing.steps[i];
-                if (elapsedTime > aStep.time) {
-                    console.log('Will move', unit.name, 'to', aStep);
-
-                    unit.latitude = aStep.latitude;
-                    unit.longitude = aStep.longitude;
-                    result = unit;
-                    if (i == unit.routing.steps.length - 1) {
-                        console.log('Vehicle', unit.name, 'moved to target location');
-                        unit.routing = null;
-                    }
-                    break;
-                }
-            }
-        } else {
-            console.log('Unit', unit.name, 'is out of time');
-        }
-    }
-    return result;
-}
 
 var processTime = function(time, type) {
     currentTime = new Date(time);
     console.log('processing time', currentTime, type, currentTime.getTime());
+
     var updated = [];
     units.forEach(function(unit) {
-        var result = unit.routing && moveUnitForTime(unit, currentTime);
+        var result = unit.time(currentTime, type);
         result && updated.push(result);
     });
     if (updated.length > 0) {
@@ -131,9 +91,6 @@ var processTime = function(time, type) {
     },
     true
 );
-
-var stations = [];
-var units    = [];
 
 
 var notifySubscribers = function (sockets, resources) {
@@ -164,7 +121,8 @@ var readData = function (filename) {
 
         //carcounter = 0;
         stations = data.stations;
-        units    = data.units;
+        units    = model.Unit(data.units);
+        //console.log('converted', data.units, 'into', units);
         console.log("Has read data file", filename, stations.length, "stations and", units.length, "ambulances");
         notifySubscribers(io.sockets, stations);
         calculateStartPositions(units, stations);

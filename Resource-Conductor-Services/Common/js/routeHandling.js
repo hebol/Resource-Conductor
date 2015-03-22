@@ -52,7 +52,7 @@ module.exports = {
                 var partDur = 0;
                 leg.steps.forEach(function (step) {
                     var positions = polyUtil.decode(step.polyline.points);
-                    console.log('working with', step, duration, partDur);
+                    //console.log('working with', step, duration, partDur);
                     for (var i = 0; i < positions.length - 1; i++) {
                         var calcDur = duration + partDur + (i * step.duration.value) / positions.length;
                         //console.log('dur', duration, 'part:', partDur, 'i', i, 'posLen:', positions.length, '=>', calcDur)
