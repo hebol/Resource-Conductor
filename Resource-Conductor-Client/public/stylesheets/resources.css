@@ -84,8 +84,9 @@
 
 #case-list ul li .case .time-2 {
     float:      right;
-    margin-top: 5px;
-    color:      #00f;
+    margin-top: 10px;
+    color:      #fff;
+    font-size:  16px;
 }
 
 #case-list ul li .case .alloc {
