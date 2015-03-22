@@ -33,16 +33,17 @@ var createCaseListItem = function(myCase) {
         panMapToObject(myCase);
         clearSelectedUnits();
         if (selectedCase !== null) {
-            $("#"+selectedCase).toggleClass("selected-case");
+            $("#event-"+selectedCase).toggleClass("selected-case");
         }
-        selectedCase = myCase.div[0].id;
-        $("#"+selectedCase).toggleClass("selected-case");
+        selectedCase = myCase.id;
+        $("#event-"+selectedCase).toggleClass("selected-case");
         setSelectedCase(myCase);
     });
 
     var $caseType = $('<div>', {class:'case-type',      text:myCase.prio});
     var $title    = $('<div>', {class:'title ellipsis', text:myCase.address});
     var $time1    = $('<div>', {class:'time-1',         text:dateUtil.getTime(new Date(myCase.time))});
+    var $time2    = $('<div>', {class:'time-2',         text:dateUtil.getTime(new Date(myCase.time2))});
     var $nl       = $('<br/>');
     var $desc     = $('<div>', {class:'desc',           text:myCase.index});
 
@@ -51,6 +52,9 @@ var createCaseListItem = function(myCase) {
     $case.append($time1);
     $case.append($nl);
     $case.append($desc);
+    if (myCase.time2 !== '') {
+        $case.append($time2);
+    }
 
     $li.append($case);
 
@@ -61,13 +65,7 @@ var setSelectedCase = function (aCase) {
     $units.empty();
     for (var unitId in unitList) {
         var unit = unitList[unitId];
-        var hide = false;
-        if (aCase.hasOwnProperty("resource")) {
-            hide = (aCase.resource != unitId);
-        } else if (unit["status"] !== "K") {
-            hide = true;
-        }
-        $units.append(createUnitListItem(unit, aCase, hide));
+        $units.append(createUnitListItem(unit, aCase, shallWeHideUnit(aCase.id, unitId)));
     }
 
     var listItems = $units.children('li').get();
@@ -160,7 +158,7 @@ var createUnitListItem = function(aUnit, anEvent, hide) {
     }
 
     var $name       = $('<div>', {class:'unitName',  text:aUnit.name});
-    var $statusTime = $('<div>', {class:'w-title',   text:""});
+    var $updateTime = $('<div>', {class:'w-title',   text:""});
     var $distance   = $('<div>', {class:'distance',  text:distance + " km"});
 
     var $locate     = $('<i>',   {class:'locate fa fa-male fa-2x'}).on('click', function() {
@@ -171,8 +169,7 @@ var createUnitListItem = function(aUnit, anEvent, hide) {
     $unit.append($name);
     $unit.append($nl1);
     //$statusTime.append($nl3);
-    $statusTime.append($distance);
-    $unit.append($statusTime);
+    $unit.append($distance);
     //$user.append($actionButton);
     //$user.append($locate);
     $unit.append($nl2);
@@ -188,6 +185,20 @@ var createUnitListItem = function(aUnit, anEvent, hide) {
 var eventList = {};
 var unitList = {};
 
+var shallWeHideUnit = function(caseId, unitId) {
+    var aCase = eventList[caseId];
+    var unit  = unitList[unitId];
+    if (caseId) {
+        if (aCase.hasOwnProperty("resource")) {
+            return (aCase.resource != unitId);
+        } else if (unit["status"] != "K") {
+            return true;
+        }
+    }
+
+    return false;
+};
+
 $(document).ready(function() {
     $events = $('#eventList');
     $units = $('#unitList');
@@ -199,11 +210,11 @@ $(document).ready(function() {
         });
         eventSocket.on('event', function (event) {
             var oldEvent = eventList[event.id];
-
+            console.log(event);
             eventList[event.id] = event;
             event.div = createCaseListItem(event);
             if (oldEvent) {
-                $(oldEvent.div.id).replaceWith(event.div);
+                $("#event-"+event.id).replaceWith(event.div);
             } else {
                 $events.append(event.div);
             }
@@ -216,7 +227,7 @@ $(document).ready(function() {
             console.log("Connected to resource service");
         });
         resourceSocket.on('resourcesUpdated', function (resources) {
-            console.log(resources);
+            //console.log(resources);
             var ambulances = resources.filter(function(resource) {return resource.type == 'A';});
             console.log("Received", resources.length, "resources found", ambulances.length, "ambulances.")
             ambulances.forEach(function(ambulance) {
@@ -225,7 +236,7 @@ $(document).ready(function() {
                 }
 
                 if (selectedCase != null) {
-                    var $unitDiv = createUnitListItem(ambulance, selectedCase);
+                    var $unitDiv = createUnitListItem(ambulance, selectedCase, shallWeHideUnit(selectedCase, ambulance.id));
                     $("#unit-"+ambulance.id).replaceWith($unitDiv);
                 }
 

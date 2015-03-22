@@ -81,6 +81,13 @@
     float:right;
 }
 
+
+#case-list ul li .case .time-2 {
+    float:      right;
+    margin-top: 5px;
+    color:      #00f;
+}
+
 #case-list ul li .case .alloc {
     float:right;
     font-size:12px;

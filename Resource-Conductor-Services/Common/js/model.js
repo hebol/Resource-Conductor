@@ -65,11 +65,11 @@ var copyProperties = function(src, dest) {
 };
 
 var Unit = function(args) {
-    var that = this;
-    this.id    = -1;
-    this.type  = 'A';
-    this.state = 'K';
-    this.route = {
+    var that    = this;
+    this.id     = -1;
+    this.type   = 'A';
+    this.status = 'K';
+    this.route  = {
         startTime: null,
         steps: null
     };
@@ -85,7 +85,7 @@ var Unit = function(args) {
 
     this.goToCase = function(aCase, time) {
         console.log('unit', that.name, 'asked to go to', aCase, 'at', time);
-        that.state = 'U';
+        that.status = 'U';
         that.route.startTime = time;
         that.route.steps = null;
         addUnit(that);
