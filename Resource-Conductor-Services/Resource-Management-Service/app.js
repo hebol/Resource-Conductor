@@ -13,10 +13,6 @@ config.registerService(port, "resource-service");
 var stations;
 var units;
 
-var hasReadData = function() {
-    return units;
-};
-
 var getUnit = function (id) {
     for (var i = 0; i < units.length; i++) {
         if (units[i].id === id) {
