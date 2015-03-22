@@ -2,7 +2,7 @@ process.title = 'resource-system';
 
 var io = require('socket.io')(),
     config = require('../Common/js/configService.js'),
-    //routeHandling = require('../Common/js/routeHandling.js'),
+    routeHandling = require('../Common/js/routeHandling.js'),
     fs = require('fs');
 
 var port = io.listen(0).httpServer.address().port;
@@ -20,16 +20,16 @@ var getUnit = function (id) {
 };
 
 function assignUnitToCase(unitId, caseId) {
-    console.log("Asked to assign resource", unitId, "to case", caseId);
+    console.log('Asked to assign resource', unitId, 'to case', caseId);
     var aCase = events[caseId];
     aCase && (events[caseId].resource = unitId);
     var unit = getUnit(unitId);
 
     if (unit) {
         //Temporary
-        unit.status = "U";
+        unit.status = 'U';
         aCase['resource'] = unitId;
-        aCase['status'] = "U";
+        aCase['status'] = 'U';
         notifySubscribers(io.sockets, [unit]);
         notifySubscribers(io.sockets, [aCase]);
 
@@ -63,44 +63,10 @@ function processEvent(event) {
     true
 );
 
-var polyUtil = require('polyline-encoded');
-function investigateRoute(routes) {
-    var steps = [];
-    routes.forEach(function(route) {
-        //console.log('There are', route.legs.length, 'parts');
-        var duration = 0, distance = 0;
-        route.legs.forEach(function(leg) {
-            //console.log('looking at', leg.start_address, 'to', leg.end_address);
-            var partDur = 0;
-            leg.steps.forEach(function(step) {
-                var positions = polyUtil.decode(step.polyline.points);
-                console.log('working with', step, duration,partDur);
-                for (var i = 0 ; i < positions.length - 1 ; i++) {
-                    var calcDur = duration + partDur + (i * step.duration.value) / positions.length;
-                    //console.log('dur', duration, 'part:', partDur, 'i', i, 'posLen:', positions.length, '=>', calcDur)
-                    var timedStep = {
-                        time: calcDur,
-                        latitude: positions[i][0],
-                        longitude:  positions[i][1]
-                    };
-                    steps.push(timedStep);
-                }
-                //console.log('dist', step.distance.value, 'dur', step.duration.value, 'pos', positions.length);
-                partDur += step.duration.value;
-            });
-            duration += leg.duration.value;
-            distance += leg.distance.value;
-        });
-        console.log('Total duration', duration, 'and length', distance);
-        //steps.forEach(function(step) { console.log('step', step)});
-    });
-    return steps;
-}
-
 function processRouteForId(id, route) {
     console.log("Received route for id", id, "==>", route);
     //console.log(JSON.stringify(route));
-    var steps = investigateRoute(route.routes);
+    var steps = routeHandling.convertGoogleRoute(route.routes);
     getUnit(id).routing = {
         steps: steps,
         startTime: currentTime
