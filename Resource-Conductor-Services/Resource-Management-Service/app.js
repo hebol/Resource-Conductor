@@ -32,10 +32,11 @@ function assignUnitToCase(unitId, caseId) {
         //Temporary
         aCase['resource'] = unitId;
         aCase['status']   = 'U';
-        aCase['time2']    = new Date();
+        aCase['time2']    = new Date().toJSON();
         unit.goToCase(aCase, currentTime);
-        notifySubscribers(io.sockets, [aCase]);
+        console.log(aCase);
         notifySubscribers(io.sockets, [unit]);
+        io.sockets.emit('cases', [aCase]);
     }
 }
 

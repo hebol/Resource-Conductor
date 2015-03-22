@@ -231,16 +231,35 @@ $(document).ready(function() {
             var ambulances = resources.filter(function(resource) {return resource.type == 'A';});
             console.log("Received", resources.length, "resources found", ambulances.length, "ambulances.")
             ambulances.forEach(function(ambulance) {
-                if (selectedUnit === ambulance.id && ambulance.status !== "A") {
-                    clearSelectedUnits();
-                }
-
                 if (selectedCase != null) {
                     var $unitDiv = createUnitListItem(ambulance, selectedCase, shallWeHideUnit(selectedCase, ambulance.id));
                     $("#unit-"+ambulance.id).replaceWith($unitDiv);
                 }
 
                 unitList[ambulance.id] = ambulance;
+
+                if (selectedUnit === ambulance.id && ambulance.status !== "A") {
+                    clearSelectedUnits();
+                }
+            });
+        });
+        resourceSocket.on('cases', function (events) {
+            events.forEach(function(event){
+                var oldEvent = eventList[event.id];
+                eventList[event.id] = event;
+                event.div = createCaseListItem(event);
+                if (oldEvent) {
+                    $("#event-"+event.id).replaceWith(event.div);
+                    if (selectedCase === event.id) {
+                        $("#event-"+event.id).addClass("selected-case");
+                    }
+                } else {
+                    $events.append(event.div);
+                }
+
+                if (selectedCase != null) {
+                    setSelectedCase(eventList[selectedCase]);
+                }
             });
         });
     });
