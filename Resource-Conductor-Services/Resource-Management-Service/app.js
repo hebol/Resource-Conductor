@@ -2,7 +2,7 @@ process.title = 'resource-system';
 
 var io = require('socket.io')(),
     config = require('../Common/js/configService.js'),
-    routeHandling = require('../Common/js/routeHandling.js'),
+    //routeHandling = require('../Common/js/routeHandling.js'),
     fs = require('fs');
 
 var port = io.listen(0).httpServer.address().port;
@@ -28,14 +28,15 @@ function assignUnitToCase(unitId, caseId) {
     if (unit) {
         //Temporary
         unit.status = "U";
-        aCase["resource"] = unitId;
-        aCase["status"] = "U";
+        aCase['resource'] = unitId;
+        aCase['status'] = "U";
         notifySubscribers(io.sockets, [unit]);
         notifySubscribers(io.sockets, [aCase]);
 
         routeConsumer.emit('getRouteForId', unit, aCase, unitId);
     }
 }
+
 io.on('connection', function(socket) {
     console.log('client', socket.id, 'connecting');
     notifySubscribers(socket, stations);
@@ -44,7 +45,6 @@ io.on('connection', function(socket) {
     socket.on('assignResourceToCase', function(unitId, caseId) {
         assignUnitToCase(unitId, caseId);
     });
-
 });
 
 var events = {};
