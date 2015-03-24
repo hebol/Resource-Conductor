@@ -44,7 +44,7 @@ function moveUnitForTime(unit, time) {
             for (var i = unit.route.steps.length - 1 ; i >= 0 ; i--) {
                 var aStep = unit.route.steps[i];
                 if (elapsedTime > aStep.time) {
-                    console.log('Will move', unit.name, 'to', aStep);
+                    //console.log('Will move', unit.name, 'to', aStep);
 
                     unit.latitude = aStep.latitude;
                     unit.longitude = aStep.longitude;
@@ -156,7 +156,7 @@ var Unit = function(args) {
                     break;
             }
             if (that.hasRoute()) {
-                console.log('Will move', that.name);
+                //console.log('Will move', that.name);
                 result = moveUnitForTime(that, time);
             }
         } else {
