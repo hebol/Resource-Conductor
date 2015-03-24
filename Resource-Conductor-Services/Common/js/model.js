@@ -16,6 +16,14 @@ function processRouteForId(id, route) {
 
     var unit = getUnit(id);
     unit.route.steps = steps;
+    if (!unit.atSiteTime) {
+        unit.atSiteTime = new Date(unit.acknowledgedTime.getTime() + steps[steps.length - 1].time * 1000);
+        unit.loadedTime = new Date(unit.atSiteTime.getTime() + 10 * 60 * 1000);
+        unit.route.startTime = unit.acknowledgedTime;
+    } else {
+        unit.atHospitalTime = new Date(unit.loadedTime.getTime() + steps[steps.length - 1].time * 1000);
+        unit.route.startTime = unit.loadedTime;
+    }
 }
 
 var routeConsumer = require('./serviceConsumer')('route-service', process.title,
@@ -43,7 +51,7 @@ function moveUnitForTime(unit, time) {
                     result = unit;
                     if (i == unit.route.steps.length - 1) {
                         console.log('Vehicle', unit.name, 'moved to target location');
-                        unit.routing = null;
+                        unit.route.steps = [];
                     }
                     break;
                 }
@@ -64,6 +72,7 @@ var copyProperties = function(src, dest) {
     }
 };
 
+
 var Unit = function(args) {
     var that    = this;
     this.id     = -1;
@@ -73,6 +82,12 @@ var Unit = function(args) {
         startTime: null,
         steps: null
     };
+    this.assignedTime = null;
+    this.acknowledgedTime = null;
+    this.atSiteTime = null;
+    this.loadedTime = null;
+    this.atHospitalTime = null;
+    this.currentCase = null;
 
     if (args.constructor === Array) {
         args.forEach(function(unit, index, list){
@@ -83,28 +98,79 @@ var Unit = function(args) {
         copyProperties(args, this);
     }
 
-    this.goToCase = function(aCase, time) {
-        console.log('unit', that.name, 'asked to go to', aCase, 'at', time);
-        that.status = 'U';
-        that.route.startTime = time;
+    this.atSite = function() {
+        that.status = 'F';
         that.route.steps = null;
+    };
+
+    this.moveToCase = function() {
+        that.route.steps = null;
+        that.status = 'U';
+        routeConsumer.emit('getRouteForId', that, that.currentCase, that.id);
+    };
+
+    this.moveToHospital = function() {
+        that.route.startTime = that.loadedTime;
+        that.route.steps = null;
+        that.status = 'L';
+
+        var hospital = {
+            latitude: 57.683088,
+            longitude: 11.959884
+        };
+        routeConsumer.emit('getRouteForId', that, hospital, that.id);
+    };
+
+    this.assignCase = function(aCase, time) {
+        console.log('unit', that.name, 'asked to go to', aCase, 'at', time);
         addUnit(that);
-        routeConsumer.emit('getRouteForId', that, aCase, that.id);
+        that.status = 'T';
+        that.assignedTime = time;
+        that.acknowledgedTime = new Date(time.getTime() + 30 * 1000);
+        that.currentCase = aCase;
     };
 
     this.time = function(time, type) {
         var result = false;
 
-        if (type == 'tick' && that.hasRoute()) {
-             result = moveUnitForTime(that, time);
+        if (type == 'tick') {
+            switch(that.status) {
+                case 'K':
+                    break;
+                case 'T':
+                    console.log('T =>', time, that.acknowledgedTime);
+                    if (time.getTime() > that.acknowledgedTime.getTime()) {
+                        that.moveToCase();
+                        result = true;
+                    }
+                    break;
+                case 'U':
+                    if (that.atSiteTime && time.getTime() > that.atSiteTime.getTime()) {
+                        that.atSite();
+                    }
+                    break;
+                case 'F':
+                    if (time.getTime() > that.loadedTime.getTime()) {
+                        that.moveToHospital();
+                    }
+                    break;
+            }
+            if (that.hasRoute()) {
+                console.log('Will move', that.name);
+                result = moveUnitForTime(that, time);
+            }
         } else {
             that.route.startTime = time;
         }
         return result;
     };
+
     this.hasRoute = function() {
-        return this.route && this.route.steps && this.route.steps.length > 0;
+        var result = that.route && that.route.steps && that.route.steps.length > 0;
+        //console.log('Unit', that.name, 'has route(', result, ')');
+        return result;
     };
+
     return this;
 };
 

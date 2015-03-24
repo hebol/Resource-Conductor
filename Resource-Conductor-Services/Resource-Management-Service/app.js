@@ -33,7 +33,7 @@ function assignUnitToCase(unitId, caseId) {
         aCase['resource'] = unitId;
         aCase['status']   = 'U';
         aCase['time2']    = new Date().toJSON();
-        unit.goToCase(aCase, currentTime);
+        unit.assignCase(aCase, currentTime);
         console.log(aCase);
         notifySubscribers(io.sockets, [unit]);
         io.sockets.emit('cases', [aCase]);

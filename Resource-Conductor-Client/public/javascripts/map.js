@@ -54,7 +54,7 @@ $(document).ready(function() {
                             reportTable.fnAddData(resource);
                             createOrUpdateMarker(resource, resource.name, resource.area, "station");
                         } else if (resource.type === "A") {
-                            createOrUpdateMarker(resource, resource.name, resource.homeStation, "ambulance");
+                            createOrUpdateMarker(resource, resource.name + ' (' + resource.status + ')', resource.homeStation, "ambulance");
                         }
                     })();
                 });
