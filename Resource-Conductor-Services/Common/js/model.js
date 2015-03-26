@@ -75,19 +75,19 @@ var copyProperties = function(src, dest) {
 
 var Unit = function(args) {
     var that    = this;
-    this.id     = -1;
-    this.type   = 'A';
-    this.status = 'K';
-    this.route  = {
+    that.id     = -1;
+    that.type   = 'A';
+    that.status = 'K';
+    that.route  = {
         startTime: null,
         steps: null
     };
-    this.assignedTime = null;
-    this.acknowledgedTime = null;
-    this.atSiteTime = null;
-    this.loadedTime = null;
-    this.atHospitalTime = null;
-    this.currentCase = null;
+    that.assignedTime = null;
+    that.acknowledgedTime = null;
+    that.atSiteTime = null;
+    that.loadedTime = null;
+    that.atHospitalTime = null;
+    that.currentCase = null;
 
     if (args.constructor === Array) {
         args.forEach(function(unit, index, list){
@@ -98,18 +98,18 @@ var Unit = function(args) {
         copyProperties(args, this);
     }
 
-    this.atSite = function() {
+    that.atSite = function() {
         that.status = 'F';
         that.route.steps = null;
     };
 
-    this.moveToCase = function() {
+    that.moveToCase = function() {
         that.route.steps = null;
         that.status = 'U';
         routeConsumer.emit('getRouteForId', that, that.currentCase, that.id);
     };
 
-    this.moveToHospital = function() {
+    that.moveToHospital = function() {
         that.route.startTime = that.loadedTime;
         that.route.steps = null;
         that.status = 'L';
@@ -121,7 +121,7 @@ var Unit = function(args) {
         routeConsumer.emit('getRouteForId', that, hospital, that.id);
     };
 
-    this.assignCase = function(aCase, time) {
+    that.assignCase = function(aCase, time) {
         console.log('unit', that.name, 'asked to go to', aCase, 'at', time);
         addUnit(that);
         that.status = 'T';
@@ -130,7 +130,7 @@ var Unit = function(args) {
         that.currentCase = aCase;
     };
 
-    this.time = function(time, type) {
+    that.time = function(time, type) {
         var result = false;
 
         if (type == 'tick') {
@@ -165,13 +165,11 @@ var Unit = function(args) {
         return result;
     };
 
-    this.hasRoute = function() {
-        var result = that.route && that.route.steps && that.route.steps.length > 0;
-        //console.log('Unit', that.name, 'has route(', result, ')');
-        return result;
+    that.hasRoute = function() {
+        return that.route && that.route.steps && that.route.steps.length > 0;
     };
 
-    return this;
+    return that;
 };
 
 module.exports = {
