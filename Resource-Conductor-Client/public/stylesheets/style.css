@@ -184,4 +184,10 @@ tbody {
     padding:          1px 2px 1px 2px;
 }
 
+/* Fix for google maps weird way of sometimes show a scrollbar in intoWindows*/
+.scrollFix {
+    line-height: 1.35;
+    overflow: hidden;
+    white-space: nowrap;
+}
 

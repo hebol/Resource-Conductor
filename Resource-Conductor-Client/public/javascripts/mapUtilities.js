@@ -81,7 +81,7 @@ var createOrUpdateMarker = function(object, title, infoText, type, zIndex) {
                 google.maps.event.addListener(marker['infoListener']);
             }
 
-            var infowindow = new google.maps.InfoWindow({content: infoText});
+            var infowindow = new google.maps.InfoWindow({content: '<div class="scrollFix">'+infoText+'</div>'});
             marker['infoListener'] = google.maps.event.addListener(marker, 'click', function() {
                 infowindow.open(map, marker);
             });
