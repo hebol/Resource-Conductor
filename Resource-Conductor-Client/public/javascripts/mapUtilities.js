@@ -1,6 +1,10 @@
 var mapMarkers = [];
 var mapOptions;
 var map;
+var AMBULANCE_Z = 10;
+var EVENT_Z     = 9;
+var HOSPITAL_Z  = 8;
+var STATION_Z   = 7;
 
 //---------------------------------------------------------------------------
 // Initialize the map
@@ -47,7 +51,7 @@ var toLatLng = function(latitude, longitude) {
 // Add and cache a marker to the map. If a marker exists for the
 // "object.id + type" only move it to its new position.
 //---------------------------------------------------------------------------
-var createOrUpdateMarker = function(object, title, infoText, type) {
+var createOrUpdateMarker = function(object, title, infoText, type, zIndex) {
     var pos;
     if (object.hasOwnProperty('latitude')) {
         pos = toLatLng(object.latitude, object.longitude);
@@ -68,7 +72,8 @@ var createOrUpdateMarker = function(object, title, infoText, type) {
             labelContent: title,
             labelAnchor:  new google.maps.Point(anchor, 0),
             labelClass:   "labels",
-            labelStyle:   {opacity: 1.0}
+            labelStyle:   {opacity: 1.0},
+            zIndex:       zIndex || AMBULANCE_Z
         });
 
         if (infoText) {

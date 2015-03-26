@@ -38,7 +38,7 @@ $(document).ready(function() {
         registerConsumer('event-service', function(service) {
             eventSocket = io.connect(service.url);
             eventSocket.on('event', function (data) {
-                createOrUpdateMarker(data,  data.index, data.address, "event");
+                createOrUpdateMarker(data,  data.index, data.address, "event", EVENT_Z);
             });
         });
     }
@@ -52,9 +52,9 @@ $(document).ready(function() {
                     (function() {
                         if (resource.type === "S") {
                             reportTable.fnAddData(resource);
-                            createOrUpdateMarker(resource, resource.name, resource.area, "station");
+                            createOrUpdateMarker(resource, resource.name, resource.area, "station", STATION_Z);
                         } else if (resource.type === "A") {
-                            createOrUpdateMarker(resource, resource.name + ' (' + resource.status + ')', resource.homeStation, "ambulance");
+                            createOrUpdateMarker(resource, resource.name + ' (' + resource.status + ')', resource.homeStation, "ambulance", AMBULANCE_Z);
                         }
                     })();
                 });
