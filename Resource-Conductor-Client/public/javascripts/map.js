@@ -8,16 +8,6 @@ $(document).ready(function() {
 
     var reportTable = $("#reportTable").dataTable({columns: [{ data: 'id' }, { data: 'name' }, { data: 'area' }]});
 
-    /*
-    $("#eventList").selectable().selectable({
-        selected: function( event, ui ) {
-            setSelectedCase(event);
-        }
-    });
-    */
-//    $("#unit-list").selectable();
-
-
     // Subscribe to time updates
     if (timeSocket == null) {
         registerConsumer('time-service', function(service) {

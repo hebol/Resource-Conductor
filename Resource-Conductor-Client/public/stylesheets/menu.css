@@ -1,3 +1,7 @@
+/*
+    This file holds the css for the bottom left menu.
+*/
+
 .menu {
     z-index:      100;
     position:     absolute;
@@ -13,7 +17,6 @@
     text-align:   left;
 
 }
-
 
 .caption {
     font-size: 11px;
