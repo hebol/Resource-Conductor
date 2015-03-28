@@ -132,7 +132,7 @@
 
 #unit-list li {
     height:           35px;
-    width:            300px;
+    width:            200px;
     background-color: rgba(0, 0, 0, 0.4);
     margin:           0 0 3px 0;
     border:           1px solid #777;
@@ -142,7 +142,7 @@
 #unit-list ul li .unit {
     height:30px;
     padding: 4px;
-    width:290px;
+    width: 190px;
     margin:0;
 }
 

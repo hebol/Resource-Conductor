@@ -148,11 +148,12 @@ tbody {
     color: #000;
 }
 
+
 #case-list {
     position:   absolute;
     color:      #fff;
-    top:        10px;
-    left:       300px;
+    top:        0px;
+    left:       0px;
     overflow:   auto;
     padding:    10px;
     margin:     0;
@@ -160,17 +161,19 @@ tbody {
     z-index:    80;
 }
 
+
 #unit-list {
     position:   absolute;
     color:      #fff;
-    top:        10px;
-    left:       700px;
+    top:        0px;
+    left:       380px;
     overflow:   auto;
     padding:    10px;
     margin:     0;
     max-height: 700px;
     z-index:    80;
 }
+
 
 .labels {
     color:            #f00;
