@@ -239,10 +239,10 @@ $(document).ready(function() {
         resourceSocket.on('resourcesUpdated', function (resources) {
             //console.log(resources);
             var ambulances = resources.filter(function(resource) {return resource.type == 'A';});
-            console.log("Received", resources.length, "resources found", ambulances.length, "ambulances.")
+            console.log("Received", resources.length, "resources found", ambulances.length, "ambulances.");
             ambulances.forEach(function(ambulance) {
                 if (selectedCase != null) {
-                    var $unitDiv = createUnitListItem(ambulance, selectedCase, shallWeHideUnit(selectedCase, ambulance.id));
+                    var $unitDiv = createUnitListItem(ambulance, eventList[selectedCase], shallWeHideUnit(selectedCase, ambulance.id));
                     $("#unit-"+ambulance.id).replaceWith($unitDiv);
                 }
 
