@@ -107,7 +107,7 @@ var calculateDistance = function (aUnit, anEvent) {
 };
 
 var assignResourceToCase = function (aUnit, anEvent) {
-    resourceSocket.emit('assignResourceToCase', aUnit.id, anEvent.id);
+    eventSocket.emit('assignResourceToCase', aUnit.id, anEvent.id);
 };
 
 var panMapToObject = function(obj, zoomLevel) {
@@ -219,14 +219,21 @@ $(document).ready(function() {
             $events.empty();
         });
         eventSocket.on('event', function (event) {
+            console.log('got event');
             var oldEvent = eventList[event.id];
-            console.log(event);
             eventList[event.id] = event;
             event.div = createCaseListItem(event);
             if (oldEvent) {
                 $("#event-"+event.id).replaceWith(event.div);
+                if (selectedCase === event.id) {
+                    $("#event-"+event.id).addClass("selected-case");
+                }
             } else {
                 $events.append(event.div);
+            }
+
+            if (selectedCase != null) {
+                setSelectedCase(eventList[selectedCase]);
             }
         });
     });
@@ -250,25 +257,6 @@ $(document).ready(function() {
 
                 if (selectedUnit === ambulance.id && ambulance.status !== "A") {
                     clearSelectedUnits();
-                }
-            });
-        });
-        resourceSocket.on('cases', function (events) {
-            events.forEach(function(event){
-                var oldEvent = eventList[event.id];
-                eventList[event.id] = event;
-                event.div = createCaseListItem(event);
-                if (oldEvent) {
-                    $("#event-"+event.id).replaceWith(event.div);
-                    if (selectedCase === event.id) {
-                        $("#event-"+event.id).addClass("selected-case");
-                    }
-                } else {
-                    $events.append(event.div);
-                }
-
-                if (selectedCase != null) {
-                    setSelectedCase(eventList[selectedCase]);
                 }
             });
         });

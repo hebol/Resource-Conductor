@@ -22,21 +22,14 @@ var getUnit = function (id) {
     return null;
 };
 
-function assignUnitToCase(unitId, caseId) {
-    console.log('Asked to assign resource', unitId, 'to case', caseId);
-    var aCase = events[caseId];
-    aCase && (events[caseId].resource = unitId);
+function assignUnitToCase(unitId, aCase) {
+    console.log('Asked to assign resource', unitId, 'to case', aCase.id);
     var unit = getUnit(unitId);
 
     if (unit) {
-        //Temporary
-        aCase['resource'] = unitId;
-        aCase['status']   = 'U';
-        aCase['time2']    = currentTime;
         unit.assignCase(aCase, currentTime);
         console.log(aCase);
         notifySubscribers(io.sockets, [unit]);
-        io.sockets.emit('cases', [aCase]);
     }
 }
 
@@ -50,22 +43,6 @@ io.on('connection', function(socket) {
     });
 });
 
-var events = {};
-
-function processEvent(event) {
-    var wasUnknown = !events[event.id];
-    events[event.id] = event;
-    wasUnknown && event.resource && assignUnitToCase(event.resource, event.id);
-}
-
-//var eventConsumer =
-    require('../Common/js/serviceConsumer')('event-service', process.title,
-    {
-        'event': processEvent
-    },
-    true
-);
-
 var currentTime;
 
 var sendStartData = function() {
@@ -76,9 +53,8 @@ var sendStartData = function() {
 
 var processTime = function(time, type) {
     currentTime = new Date(time);
-    console.log('processing time', currentTime, type, currentTime.getTime());
+    //console.log('processing time', currentTime, type, currentTime.getTime());
     if (type == 'set') {
-        events   = {};
         units    = [];
         stations = [];
         readData('resources.json', function(){
