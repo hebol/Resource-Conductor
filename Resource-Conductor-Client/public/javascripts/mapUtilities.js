@@ -37,7 +37,7 @@ var initMap = function(latitude, longitude) {
 
 var toPosition = function(latitude, longitude) {
     return new google.maps.LatLng(latitude, longitude);
-}
+};
 
 //---------------------------------------------------------------------------
 // Convert input to Google LatLong
@@ -46,6 +46,12 @@ var toLatLng = function(latitude, longitude) {
     return new google.maps.LatLng(latitude, longitude);
 };
 
+var clearMapMarkers = function() {
+    for (var key in mapMarkers) {
+        mapMarkers[key].setMap(null);
+    }
+    mapMarkers = {};
+};
 
 //---------------------------------------------------------------------------
 // Add and cache a marker to the map. If a marker exists for the

@@ -10,8 +10,8 @@ console.log("Has started server on port", port);
 
 config.registerService(port, "resource-service");
 
-var stations;
-var units;
+var stations = [];
+var units    = [];
 
 var getUnit = function (id) {
     for (var i = 0; i < units.length; i++) {
@@ -68,17 +68,31 @@ function processEvent(event) {
 
 var currentTime;
 
+var sendStartData = function() {
+    notifySubscribers(io.sockets, stations);
+    calculateStartPositions(units, stations);
+    notifySubscribers(io.sockets, units);
+};
+
 var processTime = function(time, type) {
     currentTime = new Date(time);
     console.log('processing time', currentTime, type, currentTime.getTime());
-
-    var updated = [];
-    units.forEach(function(unit) {
-        var result = unit.time(currentTime, type);
-        result && updated.push(result);
-    });
-    if (updated.length > 0) {
-        notifySubscribers(io.sockets, updated);
+    if (type == 'set') {
+        events   = {};
+        units    = [];
+        stations = [];
+        readData('resources.json', function(){
+            setTimeout(sendStartData, 500);
+        });
+    } else {
+        var updated = [];
+        units.forEach(function(unit) {
+            var result = unit.time(currentTime, type);
+            result && updated.push(result);
+        });
+        if (updated.length > 0) {
+            notifySubscribers(io.sockets, updated);
+        }
     }
 };
 
@@ -112,7 +126,7 @@ var calculateStartPositions = function (unitList, stationList) {
     });
 };
 
-var readData = function (filename) {
+var readData = function (filename, callback) {
     fs.readFile(filename, 'utf8', function (err, data) {
         if (err) { throw err;}
         data = JSON.parse(data);
@@ -122,10 +136,6 @@ var readData = function (filename) {
         units    = model.Unit(data.units);
         //console.log('converted', data.units, 'into', units);
         console.log("Has read data file", filename, stations.length, "stations and", units.length, "ambulances");
-        notifySubscribers(io.sockets, stations);
-        calculateStartPositions(units, stations);
-        notifySubscribers(io.sockets, units);
+        callback && callback();
     });
 };
-
-readData('resources.json');

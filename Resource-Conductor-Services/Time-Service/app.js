@@ -19,6 +19,7 @@ io.on('connection', function(socket) {
     socket.on('setTime', setTimeFunction);
     socket.on('setSpeed', setSpeedFunction);
     socket.on('querySpeed', function() {socket.emit('speed', speed)});
+    socket.on('queryTimeMarks', function() {socket.emit('timeMarks', [{name: 'Start', timeStamp: '2015-05-23 12:00'}]);});
     timeReference && socket.emit('time', timeReference, 'set');
 });
 
@@ -39,6 +40,7 @@ var stopTimeFunction = function() {
 };
 
 var setTimeFunction = function(time) {
+    stopTimeFunction();
     console.log("New start time", time);
     startTime = new Date();
     timeReference = new Date(time);

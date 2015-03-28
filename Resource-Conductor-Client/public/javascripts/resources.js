@@ -10,6 +10,16 @@ function toList(aMap) {
     return result;
 }
 
+
+var clearResourceAndEventData = function() {
+    selectedCase = null;
+    selectedUnit = null;
+    unitList     = {};
+    eventList    = {};
+    $events && $events.empty();
+    $units && $units.empty();
+};
+
 var selectedCase = null;
 
 var clearSelectedUnits = function() {

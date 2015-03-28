@@ -18,6 +18,8 @@ $(document).ready(function() {
                 $("#day").html(dateUtil.getDate(date));
                 if (type == 'set') {
                     $("#newTime").val(date.toJSON().slice(0, 19));
+                    clearResourceAndEventData();
+                    clearMapMarkers();
                 }
             });
         });
