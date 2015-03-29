@@ -9,7 +9,7 @@ module.exports = function() {
     return result;
 };
 
-var readCases = functions() {
+var readCases = function() {
     parse({delimiter: ';'})
 }
 
