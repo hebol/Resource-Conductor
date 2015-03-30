@@ -11,7 +11,7 @@ module.exports = function() {
 
 var readCases = function() {
     parse({delimiter: ';'})
-}
+};
 
 var read = function(filename, callback) {
     fs.readFile(filename, 'iso-8859-1', function (err, data) {
