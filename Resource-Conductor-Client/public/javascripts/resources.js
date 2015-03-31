@@ -199,8 +199,8 @@ var shallWeHideUnit = function(caseId, unitId) {
     var aCase = eventList[caseId];
     var unit  = unitList[unitId];
     if (caseId) {
-        if (aCase.hasOwnProperty("resource")) {
-            return (aCase.resource != unitId);
+        if (aCase.hasOwnProperty("resources")) {
+            return (aCase.resources.indexOf(parseInt(unitId)) === -1);
         } else if (unit["status"] != "K") {
             return true;
         }

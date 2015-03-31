@@ -1,7 +1,7 @@
 {
   "startTime": "2015-05-23 12:00",
   "eventList": [
-    {"time": "2015-05-23 11:59", "id": 1, "prio": 1, "address": "Korsvägen",     "index":"Andningsproblem", "latitude": 57.696434, "longitude": 11.986425, "time2" : "2015-05-23 12:01", "resource": 1},
+    {"time": "2015-05-23 11:59", "id": 1, "prio": 1, "address": "Korsvägen",     "index":"Andningsproblem", "latitude": 57.696434, "longitude": 11.986425, "time2" : "2015-05-23 12:01", "resources": [1]},
     {"time": "2015-05-23 12:01", "id": 2, "prio": 2, "address": "Avenyn 1",      "index":"Stor blödning",   "latitude": 57.708870, "longitude": 11.97456,  "time2" : ""},
     {"time": "2015-05-23 12:10", "id": 3, "prio": 3, "address": "Älvsborgsbron", "index":"Benbrott",        "latitude": 57.691411, "longitude": 11.901279, "time2" : ""}
   ]

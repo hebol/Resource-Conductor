@@ -69,9 +69,15 @@ var findCase = function (caseId) {
 var assignUnitToCaseById = function (unitId, caseId) {
     var aCase = findCase(caseId);
     if (aCase) {
-        console.log('Assigning', unitId, 'to', aCase);
-        aCase.resource = unitId;
+        if (aCase.hasOwnProperty("resources")) {
+            if (aCase.resources.indexOf(unitId) != -1) {
+                aCase.resources.push(unitId);
+            }
+        } else {
+            aCase["resources"] = [unitId];
+        }
 
+        console.log('Assigning', unitId, 'to', aCase);
         resourceConsumer.emit('assignResourceToCase', unitId, aCase);
         sendEvent(io.sockets, aCase, false);
     }

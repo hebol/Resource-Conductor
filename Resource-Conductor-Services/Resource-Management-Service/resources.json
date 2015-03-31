@@ -27,7 +27,7 @@
       {"id": 25, "type" : "S", "area":"Dalsland","name":"Vänersborg", "status":"F", "latitude":58.3848,    "longitude":12.32378333}],
 
   "units":
-    [ {"id":  1,  "name":"51-9120","type" : "A", "homeStation":"Vassen",    "status":"K"},
+    [ {"id":  1,  "name":"51-9120","type" : "A", "homeStation":"Vassen",    "status":"U"},
       {"id":  2,  "name":"51-9130","type" : "A", "homeStation":"Vassen",    "status":"K"},
       {"id":  3,  "name":"51-9040","type" : "A", "homeStation":"Vassen",    "status":"K"},
       {"id":  4,  "name":"51-9150","type" : "A", "homeStation":"Vassen",    "status":"K"},

@@ -33,6 +33,22 @@ require('../Common/js/serviceConsumer')('resource-service', process.title,
     true
 );
 
+// prototype object to hold log data
+var logPrototype = {
+    priority:   "",
+    address:    "",
+    caseId:     "",
+    received:   "",
+    assigned:   "",
+    arrived:    "",
+    loaded:     "",
+    atHospital: "",
+    finished:   ""
+};
+
+// Log/results data
+var cases = {};
+
 var processTime = function(time, type) {
     if (type == 'set') {
         // Clear and perhaps stash old state
@@ -42,11 +58,35 @@ var processTime = function(time, type) {
 };
 
 var processEvent = function(events) {
+    events.forEach(function(event){
+        if (cases.hasOwnProperty(event.id)) {
+            var aCase = cases[event.id];
+            // In case we change the priority
+            aCase.priority = event.prio;
+            if (aCase.assigned === "") {
+                aCase.assigned = currentTime;
+            }
+        } else {
+            var aCase = Object.create(logPrototype);
 
+            aCase.priority = event.prio;
+            aCase.caseId   = event.id;
+            aCase.address  = event.address;
+            aCase.received = currentTime;
+
+            if (event.resource) {
+                aCase.assigned = currentTime;
+            }
+
+            cases[event.id] = aCase;
+        }
+    });
 };
 
 var processResource = function(resources) {
+    resources.forEach(function(resource) {
 
+    });
 };
 
 io.on('connection', function(socket) {
