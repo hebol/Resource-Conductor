@@ -40,6 +40,7 @@ var logPrototype = {
     caseId:     "",
     received:   "",
     assigned:   "",
+    accepted:   "",
     arrived:    "",
     loaded:     "",
     atHospital: "",
@@ -48,6 +49,7 @@ var logPrototype = {
 
 // Log/results data
 var cases = {};
+var unitToCaseMapping = {};
 
 var processTime = function(time, type) {
     if (type == 'set') {
@@ -57,14 +59,26 @@ var processTime = function(time, type) {
     }
 };
 
+var formatTime = function (milliseconds) {
+    var result = "+" + (milliseconds/1000) + "s";
+    console.log('New time: ', result);
+    return result;
+};
+
 var processEvent = function(events) {
+    console.log("got events");
     events.forEach(function(event){
         if (cases.hasOwnProperty(event.id)) {
             var aCase = cases[event.id];
             // In case we change the priority
             aCase.priority = event.prio;
             if (aCase.assigned === "") {
-                aCase.assigned = currentTime;
+                aCase.assigned = formatTime(Math.abs(currentTime - aCase.received));
+            }
+            if (event.resources) {
+                event.resources.forEach(function(resource) {
+                    unitToCaseMapping[resource.id] = aCase.caseId;
+                });
             }
         } else {
             var aCase = Object.create(logPrototype);
@@ -74,8 +88,11 @@ var processEvent = function(events) {
             aCase.address  = event.address;
             aCase.received = currentTime;
 
-            if (event.resource) {
-                aCase.assigned = currentTime;
+            if (event.resources) {
+                aCase.assigned = formatTime(Math.abs(currentTime - aCase.received));
+                event.resources.forEach(function(resource) {
+                    unitToCaseMapping[resource.id] = aCase.caseId;
+                });
             }
 
             cases[event.id] = aCase;
@@ -84,8 +101,41 @@ var processEvent = function(events) {
 };
 
 var processResource = function(resources) {
-    resources.forEach(function(resource) {
+    console.log("got resources");
 
+    resources.forEach(function(aUnit) {
+        var caseId = unitToCaseMapping[resource.id];
+        if (caseId) {
+            var aCase = cases[caseId];
+
+            switch (aUnit.status) {
+                case "K":
+                    console.log("State K for assigned unit -> wrong");
+                    break;
+                case "T":
+                    console.log("State T for assigned unit -> wrong");
+                    break;
+                case "U":
+                    aCase.accepted = formatTime(Math.abs(currentTime - aCase.received));
+                    break;
+                case "F":
+                    aCase.arrived = formatTime(Math.abs(currentTime - aCase.received));
+                    break;
+                case "L":
+                    aCase.loaded = formatTime(Math.abs(currentTime - aCase.received));
+                    break;
+                case "S":
+                    aCase.atHospital = formatTime(Math.abs(currentTime - aCase.received));
+                    break;
+                case "H":
+                    // Homebound
+                    console.log("State H for assigned unit -> wrong");
+                    aCase.finished = formatTime(Math.abs(currentTime - aCase.received));
+                    break;
+                default:
+                    break;
+            }
+        }
     });
 };
 
