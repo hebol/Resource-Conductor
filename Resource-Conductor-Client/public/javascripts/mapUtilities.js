@@ -94,6 +94,7 @@ var createOrUpdateMarker = function(object, title, infoText, type, zIndex) {
         }
     } else {
         marker.setPosition(pos);
+        marker.labelContent = title;
     }
 
     marker.setTitle(title);
