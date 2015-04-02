@@ -27,8 +27,10 @@ var eventList = [];
 
 function sendEvent(target, anEvent, doAssign) {
     console.log('Sending event', anEvent.id, doAssign, anEvent.resource);
-    if (doAssign && anEvent.resource) {
-        resourceConsumer.emit('assignResourceToCase', anEvent.resource, anEvent);
+    if (doAssign && anEvent.resources) {
+        anEvent.resources.forEach(function(unitId){
+            resourceConsumer.emit('assignResourceToCase', unitId, anEvent);
+        });
     }
     target.emit('event', anEvent);
 }
