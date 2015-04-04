@@ -13,6 +13,180 @@ config.registerService(port, "log-service");
 var currentTime;
 
 
+
+// prototype object to hold log data
+var logPrototype = {
+    priority:   "",
+    address:    "",
+    caseId:     "",
+    received:   "",
+    assigned:   "",
+    accepted:   "",
+    arrived:    "",
+    loaded:     "",
+    atHospital: "",
+    finished:   ""
+};
+
+// Log/results data
+var cases             = {};
+var caseToUnitMapping = {};
+
+var processTime = function(time, type) {
+    if (type == 'set') {
+        cases             = {};
+        caseToUnitMapping = {};
+    } else {
+        currentTime = new Date(time);
+    }
+};
+
+var formatTime = function (milliseconds) {
+    var result = "+" + (milliseconds/1000) + "s";
+    console.log('New time: ', result);
+    return result;
+};
+
+var diaryData = [];
+
+var processEvent = function(events) {
+    console.log("got events", events);
+    var myEvents;
+    if(Object.prototype.toString.call(events) !== '[object Array]') {
+        myEvents = [events];
+    } else {
+        myEvents = events;
+    }
+
+    myEvents.forEach(function(event){
+        var aCase;
+        if (cases.hasOwnProperty(event.id)) {
+            aCase = cases[event.id];
+            // In case we change the priority
+            aCase.priority = event.prio;
+            if (aCase.assigned === "") {
+                aCase.assigned = formatTime(Math.abs(currentTime - aCase.received));
+                diaryData.push({"id" : aCase.caseId, "time" : currentTime, "message" : "Case moved to status 'assigned'"});
+            }
+            if (event.resources) {
+                event.resources.forEach(function(resource) {
+                    if (!caseToUnitMapping[aCase.caseId]) {
+                        caseToUnitMapping[aCase.caseId] = [resource];
+                    } else {
+                        caseToUnitMapping[aCase.caseId].push(resource);
+                    }
+                });
+            }
+        } else {
+            aCase = Object.create(logPrototype);
+            aCase.priority = event.prio;
+            aCase.caseId   = event.id;
+            aCase.address  = event.address;
+            aCase.received = currentTime;
+            diaryData.push({"id" : aCase.caseId, "time" : currentTime, "message" : "New case created"});
+
+            if (event.resources) {
+                aCase.assigned = formatTime(Math.abs(currentTime - aCase.received));
+                diaryData.push({"id" : aCase.caseId, "time" : currentTime, "message" : "Case moved to status 'assigned'"});
+            }
+
+            cases[event.id] = aCase;
+        }
+    });
+};
+
+var processResource = function(resources) {
+    resources.forEach(function(resource) {
+        if (resource.currentCase) {
+            var aCase = cases[resource.currentCase.id];
+
+            switch (resource.status) {
+                case "K":
+                    if (caseToUnitMapping[resource.id]) {
+                        var finished = true;
+                        for (unit in caseToUnitMapping[resource.id]) {
+                            if (unit.status != 'K') {
+                                console.log("State 'K' for assigned unit -> no state change");
+                                finished = false;
+                                break;
+                            }
+                        }
+
+                        if (finished) {
+                            aCase.finished = formatTime(Math.abs(currentTime - aCase.received));
+                            diaryData.push({
+                                "id"      : aCase.caseId,
+                                "time"    : currentTime,
+                                "message" : "Case moved to status 'finished'"
+                            });
+                            console.log("Case", aCase.caseId, "finished");
+                        }
+                    }
+                    break;
+                case "T":
+                    console.log("State 'T' for assigned unit -> no state change");
+                    break;
+                case "U":
+                    if (aCase.accepted == "") {
+                        aCase.accepted = formatTime(Math.abs(currentTime - aCase.received));
+                        diaryData.push({
+                            "id"      : aCase.caseId,
+                            "time"    : currentTime,
+                            "message" : "Case moved to status 'accepted'"
+                        });
+                    }
+                    break;
+                case "F":
+                    if (aCase.arrived == "") {
+                        aCase.arrived = formatTime(Math.abs(currentTime - aCase.received));
+                        diaryData.push({
+                            "id"      : aCase.caseId,
+                            "time"    : currentTime,
+                            "message" : "Case moved to status 'arrived'"
+                        });
+                    }
+                    break;
+                case "L":
+                    if (aCase.loaded == "") {
+                        aCase.loaded = formatTime(Math.abs(currentTime - aCase.received));
+                        diaryData.push({
+                            "id"      : aCase.caseId,
+                            "time"    : currentTime,
+                            "message" : "Case moved to status 'loaded'"
+                        });
+                    }
+                    break;
+                case "S":
+                    if (aCase.atHospital == "") {
+                        aCase.atHospital = formatTime(Math.abs(currentTime - aCase.received));
+                        diaryData.push({
+                            "id"      : aCase.caseId,
+                            "time"    : currentTime,
+                            "message" : "Case moved to status 'atHospital'"
+                        });
+                    }
+                    break;
+                case "H":
+                    // Homebound
+                    console.log("State 'H' for assigned unit -> no state change");
+                    aCase.finished = formatTime(Math.abs(currentTime - aCase.received));
+                    break;
+                default:
+                    console.log(resource.status);
+                    break;
+            }
+        }
+    });
+};
+
+io.on('connection', function(socket) {
+    console.log('connecting:', socket.id);
+    socket.on('queryCaseStatus', function() {
+        socket.emit('reportStatus', cases);
+    });
+});
+
+
 //var timeConsumer =
 require('../Common/js/serviceConsumer')('time-service', process.title,
     {
@@ -32,114 +206,3 @@ require('../Common/js/serviceConsumer')('resource-service', process.title,
     },
     true
 );
-
-// prototype object to hold log data
-var logPrototype = {
-    priority:   "",
-    address:    "",
-    caseId:     "",
-    received:   "",
-    assigned:   "",
-    accepted:   "",
-    arrived:    "",
-    loaded:     "",
-    atHospital: "",
-    finished:   ""
-};
-
-// Log/results data
-var cases = {};
-var unitToCaseMapping = {};
-
-var processTime = function(time, type) {
-    if (type == 'set') {
-        // Clear and perhaps stash old state
-    } else {
-        currentTime = new Date(time);
-    }
-};
-
-var formatTime = function (milliseconds) {
-    var result = "+" + (milliseconds/1000) + "s";
-    console.log('New time: ', result);
-    return result;
-};
-
-var processEvent = function(events) {
-    console.log("got events");
-    events.forEach(function(event){
-        if (cases.hasOwnProperty(event.id)) {
-            var aCase = cases[event.id];
-            // In case we change the priority
-            aCase.priority = event.prio;
-            if (aCase.assigned === "") {
-                aCase.assigned = formatTime(Math.abs(currentTime - aCase.received));
-            }
-            if (event.resources) {
-                event.resources.forEach(function(resource) {
-                    unitToCaseMapping[resource.id] = aCase.caseId;
-                });
-            }
-        } else {
-            var aCase = Object.create(logPrototype);
-
-            aCase.priority = event.prio;
-            aCase.caseId   = event.id;
-            aCase.address  = event.address;
-            aCase.received = currentTime;
-
-            if (event.resources) {
-                aCase.assigned = formatTime(Math.abs(currentTime - aCase.received));
-                event.resources.forEach(function(resource) {
-                    unitToCaseMapping[resource.id] = aCase.caseId;
-                });
-            }
-
-            cases[event.id] = aCase;
-        }
-    });
-};
-
-var processResource = function(resources) {
-    console.log("got resources");
-
-    resources.forEach(function(aUnit) {
-        var caseId = unitToCaseMapping[resource.id];
-        if (caseId) {
-            var aCase = cases[caseId];
-
-            switch (aUnit.status) {
-                case "K":
-                    console.log("State K for assigned unit -> wrong");
-                    break;
-                case "T":
-                    console.log("State T for assigned unit -> wrong");
-                    break;
-                case "U":
-                    aCase.accepted = formatTime(Math.abs(currentTime - aCase.received));
-                    break;
-                case "F":
-                    aCase.arrived = formatTime(Math.abs(currentTime - aCase.received));
-                    break;
-                case "L":
-                    aCase.loaded = formatTime(Math.abs(currentTime - aCase.received));
-                    break;
-                case "S":
-                    aCase.atHospital = formatTime(Math.abs(currentTime - aCase.received));
-                    break;
-                case "H":
-                    // Homebound
-                    console.log("State H for assigned unit -> wrong");
-                    aCase.finished = formatTime(Math.abs(currentTime - aCase.received));
-                    break;
-                default:
-                    break;
-            }
-        }
-    });
-};
-
-io.on('connection', function(socket) {
-    console.log('connecting:', socket.id);
-//    socket.on('queryTimeMarks', function() {socket.emit('timeMarks', [{name: 'Start', timeStamp: '2015-05-23 12:00'}]);});
-});
