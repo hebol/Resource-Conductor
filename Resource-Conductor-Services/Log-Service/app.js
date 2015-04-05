@@ -182,7 +182,8 @@ var processResource = function(resources) {
 io.on('connection', function(socket) {
     console.log('connecting:', socket.id);
     socket.on('queryCaseStatus', function() {
-        socket.emit('reportStatus', cases);
+        console.log("CALLED queryStatus");
+        socket.emit('caseStatus', cases);
     });
 });
 

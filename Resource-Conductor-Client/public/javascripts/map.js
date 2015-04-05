@@ -1,12 +1,69 @@
 var timeSocket;
 var eventSocket;
 var resourceSocket;
+var logSocket;
+
+var updateReport = function() {
+    if (logSocket) {
+        logSocket.emit('queryCaseStatus');
+        $("#reportTable").empty();
+    }
+};
+
+var logPrototype = {
+    priority:   "-",
+    address:    "-",
+    caseId:     "-",
+    received:   "-",
+    assigned:   "-",
+    accepted:   "-",
+    arrived:    "-",
+    loaded:     "-",
+    atHospital: "-",
+    finished:   "-"
+};
+
+var merge = function(o1, o2) {
+   for (var key in o1) {
+       if (o2.hasOwnProperty(key)) {
+           o1[key] = o2[key];
+       }
+   }
+    return o1;
+};
+
+var updateReport;
 
 $(document).ready(function() {
     // Initialize the map and add it to the map-canvas
     initMap(57.70, 11.95);
 
-    var reportTable = $("#reportTable").dataTable({columns: [{ data: 'id' }, { data: 'name' }, { data: 'area' }]});
+    var reportTable =$("#reportTable")
+        .dataTable({columns: [
+            { data: 'priority'   },
+            { data: 'caseId'     },
+            { data: 'address'    },
+            { data: 'received'   },
+            { data: 'assigned'   },
+            { data: 'accepted'   },
+            { data: 'arrived'    },
+            { data: 'loaded'     },
+            { data: 'atHospital' },
+            { data: 'finished'   }
+        ]});
+
+    if (logSocket == null) {
+        registerConsumer('log-service', function(service) {
+            logSocket = io.connect(service.url);
+            logSocket.on('caseStatus', function(cases) {
+                for (var aCase in cases) {
+                    console.log(merge(logPrototype, cases[aCase]));
+//                    reportTable.fnAddData(merge(logPrototype, cases[aCase]));
+                    reportTable.fnAddData(logPrototype);
+                }
+            });
+        });
+    }
 
     // Subscribe to time updates
     if (timeSocket == null) {
@@ -43,7 +100,6 @@ $(document).ready(function() {
                 data.forEach(function(resource) {
                     (function() {
                         if (resource.type === "S") {
-                            reportTable.fnAddData(resource);
                             createOrUpdateMarker(resource, resource.name, resource.area, "station", STATION_Z);
                         } else if (resource.type === "A") {
                             createOrUpdateMarker(resource, resource.name + ' (' + resource.status + ')', resource.homeStation, "ambulance", AMBULANCE_Z);

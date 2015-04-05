@@ -52,7 +52,7 @@
         <a href="#" onclick="$('#case-list').toggle();$('#unit-list').toggle();" class="menu-item">
             <i class="fa fa-ambulance menu-symbol"><br><span class="caption">resources</span></i>
         </a>
-        <a href="#" onclick="$('#report').toggle();" class="menu-item">
+        <a href="#" onclick="updateReport();$('#report').toggle();" class="menu-item">
             <i class="fa fa-bar-chart menu-symbol"><br><span class="caption">reports</span></i>
         </a>
         <a href="#" onclick="$('#timeControl').toggle()" class="menu-item">
@@ -66,9 +66,16 @@
         <table id="reportTable"  class="display">
             <thead>
                 <tr>
-                    <th>Id</th>
-                    <th>Name</th>
-                    <th>Area</th>
+                    <th>priority</th>
+                    <th>address</th>
+                    <th>caseId</th>
+                    <th>received</th>
+                    <th>assigned</th>
+                    <th>accepted</th>
+                    <th>arrived</th>
+                    <th>loaded</th>
+                    <th>atHospital</th>
+                    <th>finished</th>
                 </tr>
             <tbody>
             </tbody>
