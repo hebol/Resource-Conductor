@@ -44,8 +44,14 @@ var processTime = function(time, type) {
 };
 
 var formatTime = function (milliseconds) {
-    var result = "+" + (milliseconds/1000) + "s";
-    console.log('New time: ', result);
+    var seconds = Math.round((milliseconds/1000));
+    var minutes = seconds % 60;
+    var result = "+";
+    if (minutes > 0) {
+        result = result + minutes + "min ";
+    }
+    result = result + (seconds - (minutes * 60))+ "s";
+    console.log(result);
     return result;
 };
 
@@ -194,7 +200,6 @@ io.on('connection', function(socket) {
 });
 
 
-//var timeConsumer =
 require('../Common/js/serviceConsumer')('time-service', process.title,
     {
         'time': processTime
