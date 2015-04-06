@@ -4,9 +4,9 @@ var resourceSocket;
 var logSocket;
 
 var updateReport = function() {
-    if (logSocket) {
+    if (logSocket && !$('#report').is(":visible")) {
+        $("#reportTable tbody").empty();
         logSocket.emit('queryCaseStatus');
-        $("#reportTable").empty();
     }
 };
 
@@ -57,9 +57,11 @@ $(document).ready(function() {
             logSocket = io.connect(service.url);
             logSocket.on('caseStatus', function(cases) {
                 for (var aCase in cases) {
-                    console.log(merge(logPrototype, cases[aCase]));
-//                    reportTable.fnAddData(merge(logPrototype, cases[aCase]));
-                    reportTable.fnAddData(logPrototype);
+                    if (cases[aCase].hasOwnProperty('received') && cases[aCase].received) {
+                        cases[aCase].received = dateUtil.getDateTime(new Date(cases[aCase].received));
+                    }
+                    reportTable.fnAddData((merge(Object.create(logPrototype), cases[aCase])));
+                    console.log(cases[aCase]);
                 }
             });
         });

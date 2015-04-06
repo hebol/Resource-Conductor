@@ -36,6 +36,8 @@ var processTime = function(time, type) {
     if (type == 'set') {
         cases             = {};
         caseToUnitMapping = {};
+        currentTime = new Date(time);
+        console.log(currentTime);
     } else {
         currentTime = new Date(time);
     }
@@ -182,8 +184,12 @@ var processResource = function(resources) {
 io.on('connection', function(socket) {
     console.log('connecting:', socket.id);
     socket.on('queryCaseStatus', function() {
-        console.log("CALLED queryStatus");
+        console.log("CALLED queryStatus", cases);
         socket.emit('caseStatus', cases);
+    });
+    socket.on('queryDiaryData', function() {
+        console.log("Called for DiaryData", diaryData);
+        socket.emit('diaryData', diaryData);
     });
 });
 
