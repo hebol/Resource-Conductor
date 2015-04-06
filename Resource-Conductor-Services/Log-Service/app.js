@@ -43,14 +43,15 @@ var processTime = function(time, type) {
     }
 };
 
+
 var formatTime = function (milliseconds) {
-    var seconds = Math.round((milliseconds/1000));
-    var minutes = seconds % 60;
+    var seconds = Math.round(milliseconds/1000);
+    var minutes   = Math.floor(seconds / 60);
     var result = "+";
     if (minutes > 0) {
         result = result + minutes + "min ";
     }
-    result = result + (seconds - (minutes * 60))+ "s";
+    result = result + (seconds % 60) + "s";
     console.log(result);
     return result;
 };

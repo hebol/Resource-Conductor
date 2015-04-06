@@ -80,6 +80,7 @@ $(document).ready(function() {
                     $("#newTime").val(date.toJSON().slice(0, 19));
                     clearResourceAndEventData();
                     clearMapMarkers();
+                    $("#reportTable tbody").empty();
                 }
             });
         });
