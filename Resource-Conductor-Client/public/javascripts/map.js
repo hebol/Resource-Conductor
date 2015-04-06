@@ -6,7 +6,7 @@ var logSocket;
 
 var updateReport = function() {
     if (logSocket && !$('#report').is(":visible")) {
-        $("#reportTable tbody").empty();
+        $('#reportTable').dataTable().fnClearTable();
         logSocket.emit('queryCaseStatus');
     }
 };
@@ -80,7 +80,7 @@ $(document).ready(function() {
                     $("#newTime").val(date.toJSON().slice(0, 19));
                     clearResourceAndEventData();
                     clearMapMarkers();
-                    $("#reportTable tbody").empty();
+                    $('#reportTable').dataTable().fnClearTable();
                 }
             });
         });
