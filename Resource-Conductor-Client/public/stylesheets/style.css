@@ -144,6 +144,10 @@ h1 {
     color:   #fff;
 }
 
+#reportTitle {
+    cursor: move;
+}
+
 tbody {
     color: #000;
 }

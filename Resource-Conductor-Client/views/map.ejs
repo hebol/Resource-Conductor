@@ -62,7 +62,7 @@
 
     <!-- +++++++++++++++++++++++ REPORT ++++++++++++++++++++++++ -->
     <div id="report" style="display: none">
-        <h1>Report Table</h1>
+        <h1 id="reportTitle">Report Table</h1>
         <table id="reportTable"  class="display">
             <thead>
                 <tr>
@@ -115,5 +115,46 @@
 
     <!-- +++++++++++++++++++++++ MAP ++++++++++++++++++++++++ -->
     <div id='map-canvas'></div>
+
+
+    <script type="application/javascript">
+        window.onload = addListeners();
+
+        function pauseEvent(e){
+            if(e.stopPropagation) {
+                e.stopPropagation();
+            }
+            if(e.preventDefault) {
+                e.preventDefault();
+            }
+            e.cancelBubble = true;
+            e.returnValue  = false;
+            return false;
+        }
+
+        function addListeners(){
+            document.getElementById('reportTitle').addEventListener('mousedown', mouseDown, false);
+            window.addEventListener('mouseup', mouseUp, false);
+        }
+
+        function mouseUp() {
+            window.removeEventListener('mousemove', divMove, true);
+        }
+
+        function mouseDown(e) {
+            // We need this, otherwise the window would be selected while we are dragging it.
+            e=e || window.event;
+            pauseEvent(e);
+            window.addEventListener('mousemove', divMove, true);
+        }
+
+        function divMove(e) {
+            var div            = document.getElementById('report');
+            div.style.position = 'absolute';
+            div.style.top      = e.clientY + 'px';
+            div.style.left     = e.clientX + 'px';
+        }
+    </script>
+
   </body>
 </html>

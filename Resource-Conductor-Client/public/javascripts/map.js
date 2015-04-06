@@ -3,6 +3,7 @@ var eventSocket;
 var resourceSocket;
 var logSocket;
 
+
 var updateReport = function() {
     if (logSocket && !$('#report').is(":visible")) {
         $("#reportTable tbody").empty();
