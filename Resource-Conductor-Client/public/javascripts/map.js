@@ -1,7 +1,7 @@
-var timeSocket;
-var eventSocket;
-var resourceSocket;
-var logSocket;
+var timeSocket,
+    eventSocket,
+    resourceSocket,
+    logSocket;
 
 
 var updateReport = function() {
@@ -32,8 +32,6 @@ var merge = function(o1, o2) {
    }
     return o1;
 };
-
-var updateReport;
 
 $(document).ready(function() {
     // Initialize the map and add it to the map-canvas
