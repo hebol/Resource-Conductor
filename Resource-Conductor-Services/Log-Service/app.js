@@ -191,7 +191,7 @@ var processResource = function(resources) {
 io.on('connection', function(socket) {
     console.log('connecting:', socket.id);
     socket.on('queryCaseStatus', function() {
-        console.log("CALLED queryStatus", cases);
+        console.log("Called queryStatus", cases);
         socket.emit('caseStatus', cases);
     });
     socket.on('queryDiaryData', function() {

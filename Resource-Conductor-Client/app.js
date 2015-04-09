@@ -9,6 +9,7 @@ var mapRoute     = require('./routes/map');
 var reportRoute  = require('./routes/report');
 var resMgmtRoute = require('./routes/resourceManagement');
 var timeRoute    = require('./routes/time');
+var diaryRoute   = require('./routes/diary');
 
 var app = express();
 
@@ -29,6 +30,7 @@ app.use('/',        mapRoute);
 app.use('/report',  reportRoute);
 app.use('/resMgmt', resMgmtRoute);
 app.use('/time',    timeRoute);
+app.use('/diary',   diaryRoute);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
