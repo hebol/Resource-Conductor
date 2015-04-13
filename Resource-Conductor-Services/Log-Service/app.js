@@ -69,8 +69,8 @@ var processEvent = function(events) {
 
     myEvents.forEach(function(event){
         var aCase;
-        if (cases.hasOwnProperty(event.id)) {
-            aCase = cases[event.id];
+        if (cases.hasOwnProperty(event.caseId)) {
+            aCase = cases[event.caseId];
             // In case we change the priority
             aCase.priority = event.prio;
             if (aCase.assigned === "") {
@@ -89,7 +89,7 @@ var processEvent = function(events) {
         } else {
             aCase = Object.create(logPrototype);
             aCase.priority = event.prio;
-            aCase.caseId   = event.id;
+            aCase.caseId   = event.caseId;
             aCase.address  = event.address;
             aCase.received = currentTime;
             diaryData.push({"id" : aCase.caseId, "time" : currentTime, "message" : "New case created"});
@@ -99,15 +99,16 @@ var processEvent = function(events) {
                 diaryData.push({"id" : aCase.caseId, "time" : currentTime, "message" : "Case moved to status 'assigned'"});
             }
 
-            cases[event.id] = aCase;
+            cases[event.caseId] = aCase;
         }
     });
+    console.log('cases now', cases);
 };
 
 var processResource = function(resources) {
     resources.forEach(function(resource) {
         if (resource.currentCase) {
-            var aCase = cases[resource.currentCase.id];
+            var aCase = cases[resource.currentCase.caseId];
 
             switch (resource.status) {
                 case "K":

@@ -7,6 +7,7 @@ var timeSocket,
 var updateReport = function() {
     if (logSocket && !$('#report').is(":visible")) {
         $('#reportTable').dataTable().fnClearTable();
+        console.log('querying for reports', new Date());
         logSocket.emit('queryCaseStatus');
     }
 };
@@ -51,10 +52,12 @@ $(document).ready(function() {
             { data: 'finished'   }
         ]});
 
-    if (logSocket == null) {
-        registerConsumer('log-service', function(service) {
+    registerConsumer('log-service', function(service) {
+        console.log('will connect to log-service', service.url);
+        if (logSocket == null) {
             logSocket = io.connect(service.url);
             logSocket.on('caseStatus', function(cases) {
+                console.log('has received cases', cases, 'on', logSocket.id);
                 for (var aCase in cases) {
                     if (cases[aCase].hasOwnProperty('received') && cases[aCase].received) {
                         cases[aCase].received = dateUtil.getDateTime(new Date(cases[aCase].received));
@@ -63,12 +66,12 @@ $(document).ready(function() {
                     console.log(cases[aCase]);
                 }
             });
-        });
-    }
+        }
+    });
 
     // Subscribe to time updates
-    if (timeSocket == null) {
-        registerConsumer('time-service', function(service) {
+    registerConsumer('time-service', function(service) {
+        if (timeSocket == null) {
             timeSocket = io.connect(service.url);
             timeSocket.on('time', function (data, type) {
                 var date = new Date(data);
@@ -81,22 +84,22 @@ $(document).ready(function() {
                     $('#reportTable').dataTable().fnClearTable();
                 }
             });
-        });
-    }
+        }
+    });
 
     // Subscribe to event updates
-    if (eventSocket == null) {
-        registerConsumer('event-service', function(service) {
-            eventSocket = io.connect(service.url);
+    registerConsumer('event-service', function(service) {
+        eventSocket = io.connect(service.url);
+        if (eventSocket == null) {
             eventSocket.on('event', function (data) {
                 createOrUpdateMarker(data,  data.index, data.address, "event", EVENT_Z);
             });
-        });
-    }
+        }
+    });
 
     // Subscribe to event updates
-    if (resourceSocket == null) {
-        registerConsumer('resource-service', function(service) {
+    registerConsumer('resource-service', function(service) {
+        if (resourceSocket == null) {
             resourceSocket = io.connect(service.url);
             resourceSocket.on('resourcesUpdated', function (data) {
                 data.forEach(function(resource) {
@@ -109,6 +112,6 @@ $(document).ready(function() {
                     })();
                 });
             });
-        });
-    }
+        }
+    });
 });
