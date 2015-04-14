@@ -89,8 +89,8 @@ $(document).ready(function() {
 
     // Subscribe to event updates
     registerConsumer('event-service', function(service) {
-        eventSocket = io.connect(service.url);
         if (eventSocket == null) {
+            eventSocket = io.connect(service.url);
             eventSocket.on('event', function (data) {
                 createOrUpdateMarker(data,  data.index, data.address, "event", EVENT_Z);
             });

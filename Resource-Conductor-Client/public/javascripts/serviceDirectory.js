@@ -22,7 +22,8 @@ function notifyClients(serviceType, clientList) {
         if (currentServices.hasOwnProperty(index)) {
             var service = currentServices[index];
             if (serviceType == service.serviceType) {
-                clientList.forEach(function(callback){callback && callback(service); count++;});
+                count++;
+                clientList.forEach(function(callback){callback && callback(service);});
             }
         }
     }
