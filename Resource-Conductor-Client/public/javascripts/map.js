@@ -52,6 +52,54 @@ $(document).ready(function() {
             { data: 'finished'   }
         ]});
 
+    var calculateStatistics = function(cases) {
+        var statistics = {};
+        var ref = ['assignedTime', 'acceptedTime', 'arrivedTime', 'loadedTime', 'atHospitalTime', 'finishedTime'];
+
+        for (var aCase in cases) {
+            for (var i in ref) {
+                var key = ref[i];
+                if (cases[aCase].hasOwnProperty(key)) {
+
+                    // MIN
+                    if (statistics.hasOwnProperty(key) && typeof statistics[key]['min'] !== 'undefined') {
+                        statistics[key]['min'] = Math.min(statistics[key]['min'], cases[aCase][key]);
+                    } else {
+                        statistics[key] = {};
+                        statistics[key]['min'] = cases[aCase][key];
+                    }
+
+                    // MAX
+                    if (statistics.hasOwnProperty(key) && typeof statistics[key]['max'] !== 'undefined') {
+                        statistics[key]['max'] = Math.max(statistics[key]['max'], cases[aCase][key]);
+                    } else {
+                        statistics[key]['max'] = cases[aCase][key];
+                    }
+
+                    //LIST FOR AVERAGE
+                    if (statistics.hasOwnProperty(key) && typeof statistics[key]['average'] !== 'undefined') {
+                        statistics[key]['average'].push(cases[aCase][key]);
+                    } else {
+                        statistics[key]['average'] = [cases[aCase][key]];
+                    }
+                }
+            }
+        }
+
+        for (var key in statistics) {
+            var value = statistics[key];
+
+            var sum = 0;
+            for  (var i in value['average']) {
+                sum += value['average'][i];
+            }
+
+            value['average'] = Math.round(sum / value['average'].length);
+        }
+
+        console.log(statistics);
+    };
+
     registerConsumer('log-service', function(service) {
         console.log('will connect to log-service', service.url);
         if (mapLogSocket == null) {
@@ -63,8 +111,8 @@ $(document).ready(function() {
                         cases[aCase].received = dateUtil.getDateTime(new Date(cases[aCase].received));
                     }
                     reportTable.fnAddData((merge(Object.create(logPrototype), cases[aCase])));
-                    console.log(cases[aCase]);
                 }
+                calculateStatistics(cases);
             });
         }
     });

@@ -1,9 +1,9 @@
 process.title = 'resource-system';
 
-var io = require('socket.io')(),
+var io     = require('socket.io')(),
     config = require('../Common/js/configService.js'),
-    model = require('../Common/js/model.js'),
-    fs = require('fs');
+    model  = require('../Common/js/model.js'),
+    fs     = require('fs');
 
 var port = io.listen(0).httpServer.address().port;
 console.log("Has started server on port", port);

@@ -4,7 +4,8 @@ var getDiary = function() {
     diarySocket.emit('queryDiaryData');
 };
 
-
+// Make the table defaultsort on time in descending
+// order and show 25 items per page.
 $(document).ready(function() {
     var diaryTable =$("#diaryTable")
         .dataTable({columns: [

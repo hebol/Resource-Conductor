@@ -74,7 +74,9 @@ var processEvent = function(events) {
             // In case we change the priority
             aCase.priority = event.prio;
             if (aCase.assigned === "") {
-                aCase.assigned = formatTime(Math.abs(currentTime - aCase.received));
+                var time = Math.abs(currentTime - aCase.received);
+                aCase.assigned     = formatTime(time);
+                aCase.assignedTime = time;
                 diaryData.push({"id" : aCase.id, "time" : currentTime, "message" : "Case moved to status 'assigned'"});
             }
             if (event.resources) {
@@ -95,7 +97,9 @@ var processEvent = function(events) {
             diaryData.push({"id" : aCase.id, "time" : currentTime, "message" : "New case created"});
 
             if (event.resources) {
-                aCase.assigned = formatTime(Math.abs(currentTime - aCase.received));
+                var time = Math.abs(currentTime - aCase.received);
+                aCase.assigned = formatTime(time);
+                aCase.assignedTime = time;
                 diaryData.push({"id" : aCase.id, "time" : currentTime, "message" : "Case moved to status 'assigned'"});
             }
 
@@ -109,6 +113,7 @@ var processResource = function(resources) {
     resources.forEach(function(resource) {
         if (resource.currentCase) {
             var aCase = cases[resource.currentCase.id];
+            var time  = Math.abs(currentTime - aCase.received);
 
             switch (resource.status) {
                 case "K":
@@ -123,7 +128,8 @@ var processResource = function(resources) {
                         }
 
                         if (finished) {
-                            aCase.finished = formatTime(Math.abs(currentTime - aCase.received));
+                            aCase.finished     = formatTime(time);
+                            aCase.finishedTime = time;
                             diaryData.push({
                                 "id"      : aCase.id,
                                 "time"    : currentTime,
@@ -138,7 +144,8 @@ var processResource = function(resources) {
                     break;
                 case "U":
                     if (aCase.accepted == "") {
-                        aCase.accepted = formatTime(Math.abs(currentTime - aCase.received));
+                        aCase.accepted     = formatTime(time);
+                        aCase.acceptedTime = time;
                         diaryData.push({
                             "id"      : aCase.id,
                             "time"    : currentTime,
@@ -148,7 +155,8 @@ var processResource = function(resources) {
                     break;
                 case "F":
                     if (aCase.arrived == "") {
-                        aCase.arrived = formatTime(Math.abs(currentTime - aCase.received));
+                        aCase.arrived     = formatTime(time);
+                        aCase.arrivedTime = time;
                         diaryData.push({
                             "id"      : aCase.id,
                             "time"    : currentTime,
@@ -158,7 +166,8 @@ var processResource = function(resources) {
                     break;
                 case "L":
                     if (aCase.loaded == "") {
-                        aCase.loaded = formatTime(Math.abs(currentTime - aCase.received));
+                        aCase.loaded     = formatTime(time);
+                        aCase.loadedTime = time;
                         diaryData.push({
                             "id"      : aCase.id,
                             "time"    : currentTime,
@@ -168,7 +177,8 @@ var processResource = function(resources) {
                     break;
                 case "S":
                     if (aCase.atHospital == "") {
-                        aCase.atHospital = formatTime(Math.abs(currentTime - aCase.received));
+                        aCase.atHospital     = formatTime(time);
+                        aCase.atHospitalTime = time;
                         diaryData.push({
                             "id"      : aCase.id,
                             "time"    : currentTime,
@@ -179,7 +189,8 @@ var processResource = function(resources) {
                 case "H":
                     // Homebound
                     console.log("State 'H' for assigned unit -> no state change");
-                    aCase.finished = formatTime(Math.abs(currentTime - aCase.received));
+                    aCase.finished     = formatTime(time);
+                    aCase.finishedTime = time;
                     break;
                 default:
                     console.log(resource.status);
