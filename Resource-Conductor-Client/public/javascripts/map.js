@@ -52,9 +52,26 @@ $(document).ready(function() {
             { data: 'finished'   }
         ]});
 
+
+    var formatTime = function (milliseconds) {
+        var seconds = Math.round(milliseconds/1000);
+        var minutes = Math.floor(seconds / 60);
+        var result  = "";
+        if (minutes > 0) {
+            result = result + minutes + "min ";
+        }
+        result = result + (seconds % 60) + "s";
+        return result;
+    };
+
     var calculateStatistics = function(cases) {
         var statistics = {};
-        var ref = ['assignedTime', 'acceptedTime', 'arrivedTime', 'loadedTime', 'atHospitalTime', 'finishedTime'];
+        var ref        = ['assignedTime',
+                          'acceptedTime',
+                          'arrivedTime',
+                          'loadedTime',
+                          'atHospitalTime',
+                          'finishedTime'];
 
         for (var aCase in cases) {
             for (var i in ref) {
