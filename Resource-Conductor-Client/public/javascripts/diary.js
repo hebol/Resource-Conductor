@@ -22,9 +22,10 @@ $(document).ready(function() {
         diarySocket = io.connect(service.url);
         diarySocket.on('diaryData', function (data) {
             console.log(data);
-            diaryTable.fnAddData(data);
+            if (data.length > 0) {
+                diaryTable.fnAddData(data);
+            }
         });
+        getDiary();
     });
-
-    window.setInterval(getDiary, 5000);
 });

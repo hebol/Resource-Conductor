@@ -36,6 +36,7 @@ var processTime = function(time, type) {
     if (type == 'set') {
         cases             = {};
         caseToUnitMapping = {};
+        diaryData         = [];
         currentTime = new Date(time);
         console.log(currentTime);
     } else {
