@@ -2,6 +2,9 @@ var parse = require('csv-parse');
 var fs = require('fs');
 var iconv = require('iconv-lite');
 
+var dir = '/Users/martin/Dropbox/LSP/Hackaton/Hack_Case_2014-12-31/';
+
+
 module.exports = function() {
     var result = {
 
@@ -11,21 +14,35 @@ module.exports = function() {
 };
 
 var readFile = function(parser, filename) {
-    var filename = __dirname + '/../data/' + filename;
+//    var filename = __dirname + '/../data/' + filename;
+    var filename = dir + filename;
     console.log('Will open file in', filename);
     var readStream = fs.createReadStream(filename);
     var converterStream = iconv.decodeStream('latin1');
     readStream.pipe(converterStream).pipe(parser);
 };
 
-var readCases = function(callback) {
+var readFiles = function(callback, index, files) {
     var parser = parse({delimiter: ';', relax: true, columns: ['CallCenterId','CaseFolderId','CaseId',
         'CreatedTime', 'FinishedTime','PreOrdered','PickupTime','CasePriority',
         'CaseIndex1Name','CaseIndex2Name','latitude','longitude']}, function(err, data) {
         err && console.log('err', err);
         !err && callback && callback(data);
     });
-    readFile(parser, 'Hack_Case_2014-01-01.txt');
+    if (index < files.length) {
+        var file = files[index];
+        if (file.indexOf('.txt') >= 0) {
+            readFile(parser, file);
+        }
+        setTimeout(function() { readFiles(callback, index + 1, files)}, 50);
+    }
+};
+
+var readCases = function(callback) {
+    fs.readdir(dir, function(err, files) {
+        readFiles(callback, 0, files);
+    });
+//    readFile(parser, 'Hack_Case_2014-01-01.txt');
 };
 
 var readMissions= function(callback) {
@@ -47,19 +64,6 @@ var readLog = function(callback) {
     readFile(parser, 'Hack_Log_2014-01-01.txt');
 };
 
-var read = function(filename, callback) {
-    fs.readFile(filename, 'iso-8859-1', function (err, data) {
-        if (err) { throw err;}
-        data = JSON.parse(data);
-
-        stations = data.stations;
-        units    = model.Unit(data.units);
-        //console.log('converted', data.units, 'into', units);
-        console.log('Has read data file', filename, stations.length, 'stations and', units.length, 'ambulances');
-        callback && callback(data);
-    });
-};
-
 var findMission = function (list, CallCenterId, CaseFolderId, CaseId) {
     var result = list.filter(function(mission){ return mission.CallCenterId == CallCenterId && mission.CaseFolderId == CaseFolderId && mission.CaseId == CaseId;});
     result =  (result.length == 1) ? result[0] : null;
@@ -74,25 +78,34 @@ var mergeToLast = function (first, last) {
 };
 
 var missionList;
+var indexMap = {};
 
-readMissions(function(missions) {
-    console.log('Has read', missions.length, 'missions');
-    readCases( function(cases) {
-        console.log('Has read', cases.length, 'cases');
-        cases.forEach(function(aCase){
-            var mission = findMission(missions, aCase.CallCenterId, aCase.CaseFolderId, aCase.CaseId);
-            mission && mergeToLast(aCase, mission);
-            !mission && missions.push(aCase);
-        });
-        //missions.forEach(function(mission) {console.log(mission);});
-        console.log('Now', missions.length, 'missions');
-        missionList = missions;
+readCases(function(cases) {
+    cases.forEach(function(aCase){
+        indexMap[aCase.CaseIndex2Name] = aCase.CaseIndex2Name;
     });
+    console.log('has read', cases.length, 'cases', Object.keys(indexMap));
 });
 
-readLog(function(logs) {
-    console.log('Has read', logs.length, 'logs');
-});
+
+//readMissions(function(missions) {
+//    console.log('Has read', missions.length, 'missions');
+//    readCases( function(cases) {
+//        console.log('Has read', cases.length, 'cases');
+//        cases.forEach(function(aCase){
+//            var mission = findMission(missions, aCase.CallCenterId, aCase.CaseFolderId, aCase.CaseId);
+//            mission && mergeToLast(aCase, mission);
+//            !mission && missions.push(aCase);
+//        });
+//        //missions.forEach(function(mission) {console.log(mission);});
+//        console.log('Now', missions.length, 'missions');
+//        missionList = missions;
+//    });
+//});
+//
+//readLog(function(logs) {
+//    console.log('Has read', logs.length, 'logs');
+//});
 
 var findLog = function (list, aMission, time) {
     var result = null;
@@ -121,6 +134,6 @@ var getStatus = function(time) {
     console.log('Has found', active.length, 'active cases');
 };
 
-setTimeout(function() {
-    getStatus(new Date(Date.parse('2014-01-01 10:00:00')));
-}, 500);
+//setTimeout(function() {
+//    getStatus(new Date(Date.parse('2014-01-01 10:00:00')));
+//}, 500);
