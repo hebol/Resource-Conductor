@@ -26,7 +26,7 @@ var lastTime;
 var eventList = [];
 
 function sendEvent(target, anEvent, doAssign) {
-    console.log('Sending event', anEvent.caseId, doAssign, anEvent.resource);
+    console.log('Sending event', anEvent.id, doAssign, anEvent.resource);
     if (doAssign && anEvent.resources) {
         anEvent.resources.forEach(function(unitId){
             resourceConsumer.emit('assignResourceToCase', unitId, anEvent);
@@ -60,7 +60,7 @@ var processResources = function(updated) {
 
 var findCase = function (caseId) {
     for (var i = 0 ; i < eventList.length ; i++) {
-        if (eventList[i].caseId === caseId) {
+        if (eventList[i].id === caseId) {
             return eventList[i];
         }
     }

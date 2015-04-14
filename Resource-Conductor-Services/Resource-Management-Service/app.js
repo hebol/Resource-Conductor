@@ -23,7 +23,7 @@ var getUnit = function (id) {
 };
 
 function assignUnitToCase(unitId, aCase) {
-    console.log('Asked to assign resource', unitId, 'to case', aCase.caseId);
+    console.log('Asked to assign resource', unitId, 'to case', aCase.id);
     var unit = getUnit(unitId);
 
     if (unit) {

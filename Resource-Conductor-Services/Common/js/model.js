@@ -168,7 +168,7 @@ var Unit = function(args) {
     };
 
     that.assignCase = function(aCase, time) {
-        console.log('unit', that.name, 'asked to go to', aCase.caseId, 'at', time);
+        console.log('unit', that.name, 'asked to go to', aCase.id, 'at', time);
         addUnit(that);
         that.status = 'T';
         that.assignedTime = time;

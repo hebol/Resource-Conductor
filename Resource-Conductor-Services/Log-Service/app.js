@@ -18,7 +18,7 @@ var currentTime;
 var logPrototype = {
     priority:   "",
     address:    "",
-    caseId:     "",
+    id:         "",
     received:   "",
     assigned:   "",
     accepted:   "",
@@ -69,37 +69,37 @@ var processEvent = function(events) {
 
     myEvents.forEach(function(event){
         var aCase;
-        if (cases.hasOwnProperty(event.caseId)) {
-            aCase = cases[event.caseId];
+        if (cases.hasOwnProperty(event.id)) {
+            aCase = cases[event.id];
             // In case we change the priority
             aCase.priority = event.prio;
             if (aCase.assigned === "") {
                 aCase.assigned = formatTime(Math.abs(currentTime - aCase.received));
-                diaryData.push({"id" : aCase.caseId, "time" : currentTime, "message" : "Case moved to status 'assigned'"});
+                diaryData.push({"id" : aCase.id, "time" : currentTime, "message" : "Case moved to status 'assigned'"});
             }
             if (event.resources) {
                 event.resources.forEach(function(resource) {
-                    if (!caseToUnitMapping[aCase.caseId]) {
-                        caseToUnitMapping[aCase.caseId] = [resource];
+                    if (!caseToUnitMapping[aCase.id]) {
+                        caseToUnitMapping[aCase.id] = [resource];
                     } else {
-                        caseToUnitMapping[aCase.caseId].push(resource);
+                        caseToUnitMapping[aCase.id].push(resource);
                     }
                 });
             }
         } else {
             aCase = Object.create(logPrototype);
             aCase.priority = event.prio;
-            aCase.caseId   = event.caseId;
+            aCase.id       = event.id;
             aCase.address  = event.address;
             aCase.received = currentTime;
-            diaryData.push({"id" : aCase.caseId, "time" : currentTime, "message" : "New case created"});
+            diaryData.push({"id" : aCase.id, "time" : currentTime, "message" : "New case created"});
 
             if (event.resources) {
                 aCase.assigned = formatTime(Math.abs(currentTime - aCase.received));
-                diaryData.push({"id" : aCase.caseId, "time" : currentTime, "message" : "Case moved to status 'assigned'"});
+                diaryData.push({"id" : aCase.id, "time" : currentTime, "message" : "Case moved to status 'assigned'"});
             }
 
-            cases[event.caseId] = aCase;
+            cases[event.id] = aCase;
         }
     });
     console.log('cases now', cases);
@@ -108,7 +108,7 @@ var processEvent = function(events) {
 var processResource = function(resources) {
     resources.forEach(function(resource) {
         if (resource.currentCase) {
-            var aCase = cases[resource.currentCase.caseId];
+            var aCase = cases[resource.currentCase.id];
 
             switch (resource.status) {
                 case "K":
@@ -125,11 +125,11 @@ var processResource = function(resources) {
                         if (finished) {
                             aCase.finished = formatTime(Math.abs(currentTime - aCase.received));
                             diaryData.push({
-                                "id"      : aCase.caseId,
+                                "id"      : aCase.id,
                                 "time"    : currentTime,
                                 "message" : "Case moved to status 'finished'"
                             });
-                            console.log("Case", aCase.caseId, "finished");
+                            console.log("Case", aCase.id, "finished");
                         }
                     }
                     break;
@@ -140,7 +140,7 @@ var processResource = function(resources) {
                     if (aCase.accepted == "") {
                         aCase.accepted = formatTime(Math.abs(currentTime - aCase.received));
                         diaryData.push({
-                            "id"      : aCase.caseId,
+                            "id"      : aCase.id,
                             "time"    : currentTime,
                             "message" : "Case moved to status 'accepted'"
                         });
@@ -150,7 +150,7 @@ var processResource = function(resources) {
                     if (aCase.arrived == "") {
                         aCase.arrived = formatTime(Math.abs(currentTime - aCase.received));
                         diaryData.push({
-                            "id"      : aCase.caseId,
+                            "id"      : aCase.id,
                             "time"    : currentTime,
                             "message" : "Case moved to status 'arrived'"
                         });
@@ -160,7 +160,7 @@ var processResource = function(resources) {
                     if (aCase.loaded == "") {
                         aCase.loaded = formatTime(Math.abs(currentTime - aCase.received));
                         diaryData.push({
-                            "id"      : aCase.caseId,
+                            "id"      : aCase.id,
                             "time"    : currentTime,
                             "message" : "Case moved to status 'loaded'"
                         });
@@ -170,7 +170,7 @@ var processResource = function(resources) {
                     if (aCase.atHospital == "") {
                         aCase.atHospital = formatTime(Math.abs(currentTime - aCase.received));
                         diaryData.push({
-                            "id"      : aCase.caseId,
+                            "id"      : aCase.id,
                             "time"    : currentTime,
                             "message" : "Case moved to status 'atHospital'"
                         });

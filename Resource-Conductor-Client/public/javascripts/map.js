@@ -1,21 +1,21 @@
-var timeSocket,
-    eventSocket,
-    resourceSocket,
-    logSocket;
+var mapTimeSocket,
+    mapEventSocket,
+    mapResourceSocket,
+    mapLogSocket;
 
 
 var updateReport = function() {
-    if (logSocket && !$('#report').is(":visible")) {
+    if (mapLogSocket && !$('#report').is(":visible")) {
         $('#reportTable').dataTable().fnClearTable();
         console.log('querying for reports', new Date());
-        logSocket.emit('queryCaseStatus');
+        mapLogSocket.emit('queryCaseStatus');
     }
 };
 
 var logPrototype = {
     priority:   "-",
     address:    "-",
-    caseId:     "-",
+    id:         "-",
     received:   "-",
     assigned:   "-",
     accepted:   "-",
@@ -41,7 +41,7 @@ $(document).ready(function() {
     var reportTable =$("#reportTable")
         .dataTable({columns: [
             { data: 'priority'   },
-            { data: 'caseId'     },
+            { data: 'id'         },
             { data: 'address'    },
             { data: 'received'   },
             { data: 'assigned'   },
@@ -54,10 +54,10 @@ $(document).ready(function() {
 
     registerConsumer('log-service', function(service) {
         console.log('will connect to log-service', service.url);
-        if (logSocket == null) {
-            logSocket = io.connect(service.url);
-            logSocket.on('caseStatus', function(cases) {
-                console.log('has received cases', cases, 'on', logSocket.id);
+        if (mapLogSocket == null) {
+            mapLogSocket = io.connect(service.url);
+            mapLogSocket.on('caseStatus', function(cases) {
+                console.log('has received cases', cases, 'on', mapLogSocket.id);
                 for (var aCase in cases) {
                     if (cases[aCase].hasOwnProperty('received') && cases[aCase].received) {
                         cases[aCase].received = dateUtil.getDateTime(new Date(cases[aCase].received));
@@ -71,9 +71,9 @@ $(document).ready(function() {
 
     // Subscribe to time updates
     registerConsumer('time-service', function(service) {
-        if (timeSocket == null) {
-            timeSocket = io.connect(service.url);
-            timeSocket.on('time', function (data, type) {
+        if (mapTimeSocket == null) {
+            mapTimeSocket = io.connect(service.url);
+            mapTimeSocket.on('time', function (data, type) {
                 var date = new Date(data);
                 $("#clock").html(dateUtil.getTime(date));
                 $("#day").html(dateUtil.getDate(date));
@@ -89,9 +89,10 @@ $(document).ready(function() {
 
     // Subscribe to event updates
     registerConsumer('event-service', function(service) {
-        if (eventSocket == null) {
-            eventSocket = io.connect(service.url);
-            eventSocket.on('event', function (data) {
+        if (mapEventSocket == null) {
+            mapEventSocket = io.connect(service.url);
+            mapEventSocket.on('event', function (data) {
+                console.log('Will create marker for', data);
                 createOrUpdateMarker(data,  data.index, data.address, "event", EVENT_Z);
             });
         }
@@ -99,17 +100,15 @@ $(document).ready(function() {
 
     // Subscribe to event updates
     registerConsumer('resource-service', function(service) {
-        if (resourceSocket == null) {
-            resourceSocket = io.connect(service.url);
-            resourceSocket.on('resourcesUpdated', function (data) {
+        if (mapResourceSocket == null) {
+            mapResourceSocket = io.connect(service.url);
+            mapResourceSocket.on('resourcesUpdated', function (data) {
                 data.forEach(function(resource) {
-                    (function() {
-                        if (resource.type === "S") {
-                            createOrUpdateMarker(resource, resource.name, resource.area, "station", STATION_Z);
-                        } else if (resource.type === "A") {
-                            createOrUpdateMarker(resource, resource.name + ' (' + resource.status + ')', resource.homeStation, "ambulance", AMBULANCE_Z);
-                        }
-                    })();
+                    if (resource.type === "S") {
+                        createOrUpdateMarker(resource, resource.name, resource.area, "station", STATION_Z);
+                    } else if (resource.type === "A") {
+                        createOrUpdateMarker(resource, resource.name + ' (' + resource.status + ')', resource.homeStation, "ambulance", AMBULANCE_Z);
+                    }
                 });
             });
         }

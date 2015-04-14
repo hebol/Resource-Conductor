@@ -214,51 +214,55 @@ $(document).ready(function() {
     $units = $('#unitList');
 
     registerConsumer('event-service', function(service) {
-        eventSocket = io.connect(service.url);
-        eventSocket.on('connect', function () {
-            $events.empty();
-        });
-        eventSocket.on('event', function (event) {
-            console.log('got event');
-            var oldEvent = eventList[event.id];
-            eventList[event.id] = event;
-            event.div = createCaseListItem(event);
-            if (oldEvent) {
-                $("#event-"+event.id).replaceWith(event.div);
-                if (selectedCase === event.id) {
-                    $("#event-"+event.id).addClass("selected-case");
+        if (!eventSocket) {
+            eventSocket = io.connect(service.url);
+            eventSocket.on('connect', function () {
+                $events.empty();
+            });
+            eventSocket.on('event', function (event) {
+                console.log('got event');
+                var oldEvent = eventList[event.id];
+                eventList[event.id] = event;
+                event.div = createCaseListItem(event);
+                if (oldEvent) {
+                    $("#event-"+event.id).replaceWith(event.div);
+                    if (selectedCase === event.id) {
+                        $("#event-"+event.id).addClass("selected-case");
+                    }
+                } else {
+                    $events.append(event.div);
                 }
-            } else {
-                $events.append(event.div);
-            }
 
-            if (selectedCase != null) {
-                setSelectedCase(eventList[selectedCase]);
-            }
-        });
+                if (selectedCase != null) {
+                    setSelectedCase(eventList[selectedCase]);
+                }
+            });
+        }
     });
 
     registerConsumer('resource-service', function(service) {
-        resourceSocket = io.connect(service.url);
-        resourceSocket.on('connect', function () {
-            console.log("Connected to resource service");
-        });
-        resourceSocket.on('resourcesUpdated', function (resources) {
-            //console.log(resources);
-            var ambulances = resources.filter(function(resource) {return resource.type == 'A';});
-            console.log("Received", resources.length, "resources found", ambulances.length, "ambulances.");
-            ambulances.forEach(function(ambulance) {
-                if (selectedCase != null) {
-                    var $unitDiv = createUnitListItem(ambulance, eventList[selectedCase], shallWeHideUnit(selectedCase, ambulance.id));
-                    $("#unit-"+ambulance.id).replaceWith($unitDiv);
-                }
-
-                unitList[ambulance.id] = ambulance;
-
-                if (selectedUnit === ambulance.id && ambulance.status !== "A") {
-                    clearSelectedUnits();
-                }
+        if (!resourceSocket) {
+            resourceSocket = io.connect(service.url);
+            resourceSocket.on('connect', function () {
+                console.log("Connected to resource service");
             });
-        });
+            resourceSocket.on('resourcesUpdated', function (resources) {
+                //console.log(resources);
+                var ambulances = resources.filter(function(resource) {return resource.type == 'A';});
+                console.log("Received", resources.length, "resources found", ambulances.length, "ambulances.");
+                ambulances.forEach(function(ambulance) {
+                    if (selectedCase != null) {
+                        var $unitDiv = createUnitListItem(ambulance, eventList[selectedCase], shallWeHideUnit(selectedCase, ambulance.id));
+                        $("#unit-"+ambulance.id).replaceWith($unitDiv);
+                    }
+
+                    unitList[ambulance.id] = ambulance;
+
+                    if (selectedUnit === ambulance.id && ambulance.status !== "A") {
+                        clearSelectedUnits();
+                    }
+                });
+            });
+        }
     });
 });
