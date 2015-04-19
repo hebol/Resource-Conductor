@@ -65,6 +65,7 @@ $(document).ready(function() {
     };
 
     var calculateStatistics = function(cases) {
+        $("#averageTable tbody").empty();
         var statistics = {};
         var ref        = ['assignedTime',
                           'acceptedTime',
@@ -72,6 +73,7 @@ $(document).ready(function() {
                           'loadedTime',
                           'atHospitalTime',
                           'finishedTime'];
+
 
         for (var aCase in cases) {
             for (var i in ref) {
@@ -85,6 +87,7 @@ $(document).ready(function() {
                         statistics[key] = {};
                         statistics[key]['min'] = cases[aCase][key];
                     }
+
 
                     // MAX
                     if (statistics.hasOwnProperty(key) && typeof statistics[key]['max'] !== 'undefined') {
@@ -113,6 +116,25 @@ $(document).ready(function() {
 
             value['average'] = Math.round(sum / value['average'].length);
         }
+
+        var minRow = "";
+        var avgRow = "";
+        var maxRow = "";
+        for (var i in ref) {
+            var key = ref[i];
+            if (typeof statistics[key] !== 'undefined') {
+                minRow = minRow + "<td>" + formatTime(statistics[key]['min'])     + "</td>";
+                avgRow = avgRow + "<td>" + formatTime(statistics[key]['average']) + "</td>";
+                maxRow = maxRow + "<td>" + formatTime(statistics[key]['max'])     + "</td>";
+            } else {
+                minRow = minRow + "<td>-</td>";
+                avgRow = avgRow + "<td>-</td>";
+                maxRow = maxRow + "<td>-</td>";
+            }
+        }
+        $("#averageTable tbody").append("<tr><td>MIN</td>"     + minRow + "</tr>");
+        $("#averageTable tbody").append("<tr><td>AVERAGE</td>" + avgRow + "</tr>");
+        $("#averageTable tbody").append("<tr><td>MAX</td>"     + maxRow + "</tr>");
 
         console.log(statistics);
     };
@@ -147,6 +169,7 @@ $(document).ready(function() {
                     clearResourceAndEventData();
                     clearMapMarkers();
                     $('#reportTable').dataTable().fnClearTable();
+                    $("#averageTable tbody").empty();
                 }
             });
         }
