@@ -113,13 +113,59 @@ var index = [
     'Övrigt',
     'Helikopter 5920'];
 
-var sahlgrenska = {latitude: 57.683088,longitude: 11.959884}; // Ej barn eller ortopedi
-var molndal     = {latitude: 57.661244,longitude: 12.012948}; // Medicin och ortoped, ej barn, kirurg, trauma
-var ostra       = {latitude: 57.7206,  longitude: 12.0535};   // Barn, medicin och kirurgi, ej vissa trauma och ortoped (men barnortopedi)
-var kungalv     = {latitude: 57.878,   longitude: 11.969};    // medicin, kirurgi, ortoped (vissa trauma) ej barn)
+var getDistanceFromLatLonInKm = function(lat1,lon1,lat2,lon2) {
+    var deg2rad = function(deg) {
+        return deg * (Math.PI/180);
+    };
+    var R = 6371; // Radius of the earth in km
+    var dLat = deg2rad(lat2 - lat1);  // deg2rad below
+    var dLon = deg2rad(lon2 - lon1);
+    var a =
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon/2) * Math.sin(dLon/2)
+        ;
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c; // Distance in km
+};
+
+
+var sahlgrenska = {latitude: 57.683088,longitude: 11.959884, name: "Sahlgrenska"}; // Ej barn eller ortopedi
+var molndal     = {latitude: 57.661244,longitude: 12.012948, name: "Sahlgrenska"}; // Medicin och ortoped, ej barn, kirurg, trauma
+var ostra       = {latitude: 57.7206,  longitude: 12.0535,   name: "Östra"};   // Barn, medicin och kirurgi, ej vissa trauma och ortoped (men barnortopedi)
+var kungalv     = {latitude: 57.878,   longitude: 11.969,    name: "Kungälv"};    // medicin, kirurgi, ortoped (vissa trauma) ej barn)
 
 var getHospitalLocationForCase = function(aCase) {
-    return sahlgrenska;
+    var selected;
+    var shortest;
+    if (aCase.index.indexOf('arn') >= 0) {
+        selected = ostra;
+    } else {
+        if (aCase.index == 'Suicidmisstanke-psykiatri') {
+            selected = ostra;
+        } else {
+            if (aCase.index == 'Extremitet/Sårskador/Mindre trauma') {
+                selected = molndal;
+            } else {
+                var available = [sahlgrenska, molndal, ostra, kungalv];
+                available.forEach(function(hospital) {
+                    var distance = getDistanceFromLatLonInKm(aCase.latitude, aCase.longitude, hospital.latitude, hospital.longitude);
+                    if (!selected || shortest > distance) {
+                        selected = hospital;
+                        shortest = distance;
+                    }
+                });
+            }
+        }
+    }
+
+    console.log('Selected hospital', selected.name);
+    if (shortest) {
+        console.log('The hospital was closest;', shortest, 'km away');
+    }
+
+
+    return selected;
 };
 
 
