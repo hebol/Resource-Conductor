@@ -118,8 +118,8 @@ var molndal     = {latitude: 57.661244,longitude: 12.012948}; // Medicin och ort
 var ostra       = {latitude: 57.7206,  longitude: 12.0535};   // Barn, medicin och kirurgi, ej vissa trauma och ortoped (men barnortopedi)
 var kungalv     = {latitude: 57.878,   longitude: 11.969};    // medicin, kirurgi, ortoped (vissa trauma) ej barn)
 
-var getLocationForCase = function(aCase) {
-
+var getHospitalLocationForCase = function(aCase) {
+    return sahlgrenska;
 };
 
 
@@ -164,7 +164,7 @@ var Unit = function(args) {
         that.route.steps = null;
         that.status = 'L';
 
-        routeConsumer.emit('getRouteForId', that, getLocationForCase(that.currentCase), that.id);
+        routeConsumer.emit('getRouteForId', that, getHospitalLocationForCase(that.currentCase), that.id);
     };
 
     that.assignCase = function(aCase, time) {
