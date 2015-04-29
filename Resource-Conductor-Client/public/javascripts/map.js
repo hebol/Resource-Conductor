@@ -58,7 +58,7 @@ $(document).ready(function() {
         var minutes = Math.floor(seconds / 60);
         var result  = "";
         if (minutes > 0) {
-            result = result + minutes + "min ";
+            result = minutes + "min ";
         }
         result = result + (seconds % 60) + "s";
         return result;
@@ -132,6 +132,7 @@ $(document).ready(function() {
                 maxRow = maxRow + "<td>-</td>";
             }
         }
+
         $("#averageTable tbody").append("<tr><td>MIN</td>"     + minRow + "</tr>");
         $("#averageTable tbody").append("<tr><td>AVERAGE</td>" + avgRow + "</tr>");
         $("#averageTable tbody").append("<tr><td>MAX</td>"     + maxRow + "</tr>");
@@ -202,3 +203,4 @@ $(document).ready(function() {
         }
     });
 });
+

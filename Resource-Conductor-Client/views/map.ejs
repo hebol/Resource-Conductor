@@ -133,42 +133,60 @@
 
 
     <script type="application/javascript">
-        window.onload = addListeners();
+        var WindowMover = {
+            leftOffset: 0,
+            topOffset:  0,
 
-        function pauseEvent(e){
-            if(e.stopPropagation) {
-                e.stopPropagation();
+            pauseEvent: function(e){
+                if(e.stopPropagation) {
+                    e.stopPropagation();
+                }
+                if(e.preventDefault) {
+                    e.preventDefault();
+                }
+                e.cancelBubble = true;
+                e.returnValue  = false;
+                return false;
+            },
+
+            getOffset: function( el ) {
+                var x = 0;
+                var y = 0;
+                while (el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
+                    x += el.offsetLeft - el.scrollLeft;
+                    y += el.offsetTop  - el.scrollTop;
+                    el = el.offsetParent;
+                }
+                return {top: y, left: x};
+            },
+
+            addListeners: function(divName){
+                document.getElementById('reportTitle').addEventListener('mousedown', WindowMover.mouseDown, false);
+                window.addEventListener('mouseup', WindowMover.mouseUp, false);
+            },
+
+            mouseUp: function() {
+                window.removeEventListener('mousemove', WindowMover.divMove, true);
+            },
+
+            mouseDown: function(e) {
+                // We need this, otherwise the window would be selected while we are dragging it.
+                e=e || window.event;
+                WindowMover.pauseEvent(e);
+                WindowMover.leftOffset = e.clientX - WindowMover.getOffset(document.getElementById('report')).left;
+                WindowMover.topOffset  = e.clientY - WindowMover.getOffset(document.getElementById('report')).top;
+                window.addEventListener('mousemove', WindowMover.divMove, true);
+            },
+
+            divMove: function(e) {
+                var div            = document.getElementById('report');
+                div.style.position = 'absolute';
+                div.style.top      = e.clientY - WindowMover.topOffset  + 'px';
+                div.style.left     = e.clientX - WindowMover.leftOffset + 'px';
             }
-            if(e.preventDefault) {
-                e.preventDefault();
-            }
-            e.cancelBubble = true;
-            e.returnValue  = false;
-            return false;
-        }
+        };
 
-        function addListeners(){
-            document.getElementById('reportTitle').addEventListener('mousedown', mouseDown, false);
-            window.addEventListener('mouseup', mouseUp, false);
-        }
-
-        function mouseUp() {
-            window.removeEventListener('mousemove', divMove, true);
-        }
-
-        function mouseDown(e) {
-            // We need this, otherwise the window would be selected while we are dragging it.
-            e=e || window.event;
-            pauseEvent(e);
-            window.addEventListener('mousemove', divMove, true);
-        }
-
-        function divMove(e) {
-            var div            = document.getElementById('report');
-            div.style.position = 'absolute';
-            div.style.top      = e.clientY + 'px';
-            div.style.left     = e.clientX + 'px';
-        }
+        window.onload = WindowMover.addListeners();
     </script>
 
   </body>
