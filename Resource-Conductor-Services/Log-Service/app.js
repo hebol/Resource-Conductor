@@ -37,6 +37,7 @@ var processTime = function(time, type) {
         cases             = {};
         caseToUnitMapping = {};
         diaryData         = [];
+        resourceStatus    = {};
         currentTime = new Date(time);
         console.log(currentTime);
     } else {
@@ -110,92 +111,104 @@ var processEvent = function(events) {
     console.log('cases now', cases);
 };
 
+var resourceStatus = {};
+
+var resourceStatusUpdated = function(resource) {
+    if (typeof resourceStatus[resource.id] === 'undefined' || resourceStatus[resource.id] !== resource.status) {
+        resourceStatus[resource.id] = resource.status;
+        return true;
+    }
+    return false;
+};
+
 var processResource = function(resources) {
     resources.forEach(function(resource) {
         if (resource.currentCase) {
             var aCase = cases[resource.currentCase.id];
             var time  = Math.abs(currentTime - aCase.received);
 
-            switch (resource.status) {
-                case "K":
-                    if (caseToUnitMapping[resource.id]) {
-                        var finished = true;
-                        for (unit in caseToUnitMapping[resource.id]) {
-                            if (unit.status != 'K') {
-                                console.log("State 'K' for assigned unit -> no state change");
-                                finished = false;
-                                break;
+            if (resourceStatusUpdated(resource)) {
+                switch (resource.status) {
+                    case "K":
+                        if (caseToUnitMapping[resource.id]) {
+                            var finished = true;
+                            for (unit in caseToUnitMapping[resource.id]) {
+                                if (unit.status != 'K') {
+                                    console.log("State 'K' for assigned unit -> no state change");
+                                    finished = false;
+                                    break;
+                                }
+                            }
+
+                            if (finished) {
+                                aCase.finished     = formatTime(time);
+                                aCase.finishedTime = time;
+                                diaryData.push({
+                                    "id"      : aCase.id,
+                                    "time"    : currentTime,
+                                    "message" : "Case moved to status 'finished'"
+                                });
+                                console.log("Case", aCase.id, "finished");
                             }
                         }
-
-                        if (finished) {
-                            aCase.finished     = formatTime(time);
-                            aCase.finishedTime = time;
+                        break;
+                    case "T":
+                        console.log("State 'T' for assigned unit -> no state change");
+                        break;
+                    case "U":
+                        if (aCase.accepted == "") {
+                            aCase.accepted     = formatTime(time);
+                            aCase.acceptedTime = time;
                             diaryData.push({
                                 "id"      : aCase.id,
                                 "time"    : currentTime,
-                                "message" : "Case moved to status 'finished'"
+                                "message" : "Case moved to status 'accepted'"
                             });
-                            console.log("Case", aCase.id, "finished");
                         }
-                    }
-                    break;
-                case "T":
-                    console.log("State 'T' for assigned unit -> no state change");
-                    break;
-                case "U":
-                    if (aCase.accepted == "") {
-                        aCase.accepted     = formatTime(time);
-                        aCase.acceptedTime = time;
-                        diaryData.push({
-                            "id"      : aCase.id,
-                            "time"    : currentTime,
-                            "message" : "Case moved to status 'accepted'"
-                        });
-                    }
-                    break;
-                case "F":
-                    if (aCase.arrived == "") {
-                        aCase.arrived     = formatTime(time);
-                        aCase.arrivedTime = time;
-                        diaryData.push({
-                            "id"      : aCase.id,
-                            "time"    : currentTime,
-                            "message" : "Case moved to status 'arrived'"
-                        });
-                    }
-                    break;
-                case "L":
-                    if (aCase.loaded == "") {
-                        aCase.loaded     = formatTime(time);
-                        aCase.loadedTime = time;
-                        diaryData.push({
-                            "id"      : aCase.id,
-                            "time"    : currentTime,
-                            "message" : "Case moved to status 'loaded'"
-                        });
-                    }
-                    break;
-                case "S":
-                    if (aCase.atHospital == "") {
-                        aCase.atHospital     = formatTime(time);
-                        aCase.atHospitalTime = time;
-                        diaryData.push({
-                            "id"      : aCase.id,
-                            "time"    : currentTime,
-                            "message" : "Case moved to status 'atHospital'"
-                        });
-                    }
-                    break;
-                case "H":
-                    // Homebound
-                    console.log("State 'H' for assigned unit -> no state change");
-                    aCase.finished     = formatTime(time);
-                    aCase.finishedTime = time;
-                    break;
-                default:
-                    console.log(resource.status);
-                    break;
+                        break;
+                    case "F":
+                        if (aCase.arrived == "") {
+                            aCase.arrived     = formatTime(time);
+                            aCase.arrivedTime = time;
+                            diaryData.push({
+                                "id"      : aCase.id,
+                                "time"    : currentTime,
+                                "message" : "Case moved to status 'arrived'"
+                            });
+                        }
+                        break;
+                    case "L":
+                        if (aCase.loaded == "") {
+                            aCase.loaded     = formatTime(time);
+                            aCase.loadedTime = time;
+                            diaryData.push({
+                                "id"      : aCase.id,
+                                "time"    : currentTime,
+                                "message" : "Case moved to status 'loaded'"
+                            });
+                        }
+                        break;
+                    case "S":
+                        if (aCase.atHospital == "") {
+                            aCase.atHospital     = formatTime(time);
+                            aCase.atHospitalTime = time;
+                            diaryData.push({
+                                "id"      : aCase.id,
+                                "time"    : currentTime,
+                                "message" : "Case moved to status 'atHospital'"
+                            });
+                        }
+                        break;
+                    case "H":
+                        // Homebound
+                        console.log("State 'H' for assigned unit -> no state change");
+                        aCase.finished     = formatTime(time);
+                        aCase.finishedTime = time;
+                        break;
+                    default:
+                        console.log(resource.status);
+                        break;
+                }
             }
         }
     });
