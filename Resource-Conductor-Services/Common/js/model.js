@@ -161,7 +161,7 @@ var getHospitalLocationForCase = function(aCase) {
 
     console.log('Selected hospital', selected.name);
     if (shortest) {
-        console.log('The hospital was closest;', shortest, 'km away');
+        console.log('The hospital was closest; it was', Math.round(shortest * 100) / 100, 'km away');
     }
 
 
@@ -239,17 +239,19 @@ var Unit = function(args) {
                 case 'U':
                     if (that.atSiteTime && time.getTime() > that.atSiteTime.getTime()) {
                         that.atSite();
+                        result = true;
                     }
                     break;
                 case 'F':
                     if (time.getTime() > that.loadedTime.getTime()) {
                         that.moveToHospital();
+                        result = true;
                     }
                     break;
             }
             if (that.hasRoute()) {
                 //console.log('Will move', that.name);
-                result = moveUnitForTime(that, time);
+                result = moveUnitForTime(that, time) || result;
             }
         } else {
             that.route.startTime = time;
