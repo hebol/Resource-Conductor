@@ -98,6 +98,10 @@ var calculateStartPositions = function (unitList, stationList) {
         } else {
             unit.latitude = station.latitude;
             unit.longitude = station.longitude;
+            unit.homeStationPos = {
+                latitude: station.latitude,
+                longitude: station.longitude
+            };
         }
     });
 };

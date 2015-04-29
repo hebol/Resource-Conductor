@@ -16,13 +16,19 @@ function processRouteForId(id, route) {
 
     var unit = getUnit(id);
     unit.route.steps = steps;
-    if (!unit.atSiteTime) {
-        unit.atSiteTime = new Date(unit.acknowledgedTime.getTime() + steps[steps.length - 1].time * 1000);
-        unit.loadedTime = new Date(unit.atSiteTime.getTime() + 10 * 60 * 1000);
-        unit.route.startTime = unit.acknowledgedTime;
+    if (unit.status == 'H') {
+            unit.atHomeStation = new Date(unit.readyAtHospitalTime.getTime() + steps[steps.length - 1].time * 1000);
+            unit.route.startTime = unit.readyAtHospitalTime;
     } else {
-        unit.atHospitalTime = new Date(unit.loadedTime.getTime() + steps[steps.length - 1].time * 1000);
-        unit.route.startTime = unit.loadedTime;
+        if (!unit.atSiteTime) {
+            unit.atSiteTime = new Date(unit.acknowledgedTime.getTime() + steps[steps.length - 1].time * 1000);
+            unit.loadedTime = new Date(unit.atSiteTime.getTime() + 10 * 60 * 1000);
+            unit.route.startTime = unit.acknowledgedTime;
+        } else {
+            unit.atHospitalTime = new Date(unit.loadedTime.getTime() + steps[steps.length - 1].time * 1000);
+            unit.readyAtHospitalTime = new Date(unit.atHospitalTime.getTime() + 20 * 60 * 1000);
+            unit.route.startTime = unit.loadedTime;
+        }
     }
 }
 
@@ -40,7 +46,7 @@ function moveUnitForTime(unit, time) {
         //console.log('looking at unit', unit, 'for move');
         var elapsedTime = (time.getTime() - unit.route.startTime.getTime()) / 1000;
         if (elapsedTime > 0 && unit.route.steps.length >= 0) {
-            console.log('Will move', unit.name, 'steps(', unit.route.steps.length, ')', elapsedTime);
+            console.log('Will move', unit.name, '(', unit.status, ')', 'steps(', unit.route.steps.length, ')', elapsedTime);
             for (var i = unit.route.steps.length - 1 ; i >= 0 ; i--) {
                 var aStep = unit.route.steps[i];
                 if (elapsedTime > aStep.time) {
@@ -199,10 +205,26 @@ var Unit = function(args) {
         that.route.steps = null;
     };
 
+    that.atHome = function() {
+        that.status = 'K';
+        that.route.steps = null;
+    };
+
     that.moveToCase = function() {
         that.route.steps = null;
         that.status = 'U';
         routeConsumer.emit('getRouteForId', that, that.currentCase, that.id);
+    };
+
+    that.moveToHomeStation = function() {
+        that.route.steps = null;
+        that.status = 'H';
+        routeConsumer.emit('getRouteForId', that, that.homeStationPos, that.id);
+    };
+
+    that.atHospital = function() {
+        that.status = 'S';
+        that.route.steps = null;
     };
 
     that.moveToHospital = function() {
@@ -233,24 +255,42 @@ var Unit = function(args) {
                     console.log('T =>', time, that.acknowledgedTime);
                     if (time.getTime() > that.acknowledgedTime.getTime()) {
                         that.moveToCase();
-                        result = true;
+                        result = that;
                     }
                     break;
                 case 'U':
                     if (that.atSiteTime && time.getTime() > that.atSiteTime.getTime()) {
                         that.atSite();
-                        result = true;
+                        result = that;
                     }
                     break;
                 case 'F':
                     if (time.getTime() > that.loadedTime.getTime()) {
                         that.moveToHospital();
-                        result = true;
+                        result = that;
+                    }
+                    break;
+                case 'L':
+                    if (time.getTime() > that.atHospitalTime.getTime()) {
+                        that.atHospital();
+                        result = that;
+                    }
+                    break;
+                case 'S':
+                    if (time.getTime() > that.readyAtHospitalTime.getTime()) {
+                        that.moveToHomeStation();
+                        result = that;
+                    }
+                    break;
+                case 'H':
+                    break;
+                    if (time.getTime() > that.atHomeStation.getTime()) {
+                        that.atHome();
+                        result = that;
                     }
                     break;
             }
             if (that.hasRoute()) {
-                //console.log('Will move', that.name);
                 result = moveUnitForTime(that, time) || result;
             }
         } else {
@@ -270,6 +310,7 @@ module.exports = {
     Unit: Unit
 };
 
+/*
 var index2 =
 [ 'Sänkt eller sjunkande medvetandegrad',
     'Starka smärtor mitt i bröstet',
@@ -631,3 +672,4 @@ var index2 =
     'Medvetslöshet',
     'Stroke',
     'Trauma - Penetrerande' ];
+    */
