@@ -5,27 +5,25 @@ var io = require('socket.io')(),
 
 var port = io.listen(0).httpServer.address().port;
 
-console.log("Has started server on port", port);
+console.log('Has started server on port', port);
 
-config.setup("log-system");
-config.registerService(port, "log-service");
+config.setup('log-system');
+config.registerService(port, 'log-service');
 
 var currentTime;
 
-
-
 // prototype object to hold log data
 var logPrototype = {
-    priority:   "",
-    address:    "",
-    id:         "",
-    received:   "",
-    assigned:   "",
-    accepted:   "",
-    arrived:    "",
-    loaded:     "",
-    atHospital: "",
-    finished:   ""
+    priority:   '',
+    address:    '',
+    id:         '',
+    received:   '',
+    assigned:   '',
+    accepted:   '',
+    arrived:    '',
+    loaded:     '',
+    atHospital: '',
+    finished:   ''
 };
 
 // Log/results data
@@ -49,11 +47,11 @@ var processTime = function(time, type) {
 var formatTime = function (milliseconds) {
     var seconds = Math.round(milliseconds/1000);
     var minutes   = Math.floor(seconds / 60);
-    var result = "+";
+    var result = '+';
     if (minutes > 0) {
-        result = result + minutes + "min ";
+        result = result + minutes + 'min ';
     }
-    result = result + (seconds % 60) + "s";
+    result = result + (seconds % 60) + 's';
     console.log(result);
     return result;
 };
@@ -61,7 +59,7 @@ var formatTime = function (milliseconds) {
 var diaryData = [];
 
 var processEvent = function(events) {
-    console.log("got events", events);
+    console.log('got events', events);
     var myEvents;
     if(Object.prototype.toString.call(events) !== '[object Array]') {
         myEvents = [events];
@@ -71,15 +69,16 @@ var processEvent = function(events) {
 
     myEvents.forEach(function(event){
         var aCase;
+        var time;
         if (cases.hasOwnProperty(event.id)) {
             aCase = cases[event.id];
             // In case we change the priority
             aCase.priority = event.prio;
-            if (aCase.assigned === "") {
-                var time = Math.abs(currentTime - aCase.received);
+            if (aCase.assigned === '') {
+                time = Math.abs(currentTime - aCase.received);
                 aCase.assigned     = formatTime(time);
                 aCase.assignedTime = time;
-                diaryData.push({"id" : aCase.id, "time" : currentTime, "message" : "Case moved to status 'assigned'"});
+                diaryData.push({'id' : aCase.id, 'time' : currentTime, 'message' : 'Case moved to status "assigned"'});
             }
             if (event.resources) {
                 event.resources.forEach(function(resource) {
@@ -96,13 +95,13 @@ var processEvent = function(events) {
             aCase.id       = event.id;
             aCase.address  = event.address;
             aCase.received = currentTime;
-            diaryData.push({"id" : aCase.id, "time" : currentTime, "message" : "New case created"});
+            diaryData.push({'id' : aCase.id, 'time' : currentTime, 'message' : 'New case created'});
 
             if (event.resources) {
-                var time = Math.abs(currentTime - aCase.received);
+                time = Math.abs(currentTime - aCase.received);
                 aCase.assigned = formatTime(time);
                 aCase.assignedTime = time;
-                diaryData.push({"id" : aCase.id, "time" : currentTime, "message" : "Case moved to status 'assigned'"});
+                diaryData.push({'id' : aCase.id, 'time' : currentTime, 'message' : 'Case moved to status "assigned"'});
             }
 
             cases[event.id] = aCase;
@@ -129,12 +128,12 @@ var processResource = function(resources) {
 
             if (resourceStatusUpdated(resource)) {
                 switch (resource.status) {
-                    case "K":
+                    case 'K':
                         if (caseToUnitMapping[resource.id]) {
                             var finished = true;
-                            for (unit in caseToUnitMapping[resource.id]) {
+                            for (var unit in Object.keys(caseToUnitMapping[resource.id])) {
                                 if (unit.status != 'K') {
-                                    console.log("State 'K' for assigned unit -> no state change");
+                                    console.log('State "K" for assigned unit -> no state change');
                                     finished = false;
                                     break;
                                 }
@@ -144,64 +143,64 @@ var processResource = function(resources) {
                                 aCase.finished     = formatTime(time);
                                 aCase.finishedTime = time;
                                 diaryData.push({
-                                    "id"      : aCase.id,
-                                    "time"    : currentTime,
-                                    "message" : "Case moved to status 'finished'"
+                                    'id'      : aCase.id,
+                                    'time'    : currentTime,
+                                    'message' : 'Case moved to status "finished"'
                                 });
-                                console.log("Case", aCase.id, "finished");
+                                console.log('Case', aCase.id, 'finished');
                             }
                         }
                         break;
-                    case "T":
-                        console.log("State 'T' for assigned unit -> no state change");
+                    case 'T':
+                        console.log('State "T" for assigned unit -> no state change');
                         break;
-                    case "U":
-                        if (aCase.accepted == "") {
+                    case 'U':
+                        if (aCase.accepted == '') {
                             aCase.accepted     = formatTime(time);
                             aCase.acceptedTime = time;
                             diaryData.push({
-                                "id"      : aCase.id,
-                                "time"    : currentTime,
-                                "message" : "Case moved to status 'accepted'"
+                                'id'      : aCase.id,
+                                'time'    : currentTime,
+                                'message' : 'Case moved to status "accepted"'
                             });
                         }
                         break;
-                    case "F":
-                        if (aCase.arrived == "") {
+                    case 'F':
+                        if (aCase.arrived == '') {
                             aCase.arrived     = formatTime(time);
                             aCase.arrivedTime = time;
                             diaryData.push({
-                                "id"      : aCase.id,
-                                "time"    : currentTime,
-                                "message" : "Case moved to status 'arrived'"
+                                'id'      : aCase.id,
+                                'time'    : currentTime,
+                                'message' : 'Case moved to status "arrived"'
                             });
                         }
                         break;
-                    case "L":
-                        if (aCase.loaded == "") {
+                    case 'L':
+                        if (aCase.loaded == '') {
                             aCase.loaded     = formatTime(time);
                             aCase.loadedTime = time;
                             diaryData.push({
-                                "id"      : aCase.id,
-                                "time"    : currentTime,
-                                "message" : "Case moved to status 'loaded'"
+                                'id'      : aCase.id,
+                                'time'    : currentTime,
+                                'message' : 'Case moved to status "loaded"'
                             });
                         }
                         break;
-                    case "S":
-                        if (aCase.atHospital == "") {
+                    case 'S':
+                        if (aCase.atHospital == '') {
                             aCase.atHospital     = formatTime(time);
                             aCase.atHospitalTime = time;
                             diaryData.push({
-                                "id"      : aCase.id,
-                                "time"    : currentTime,
-                                "message" : "Case moved to status 'atHospital'"
+                                'id'      : aCase.id,
+                                'time'    : currentTime,
+                                'message' : 'Case moved to status "atHospital"'
                             });
                         }
                         break;
-                    case "H":
+                    case 'H':
                         // Homebound
-                        console.log("State 'H' for assigned unit -> no state change");
+                        console.log('State "H" for assigned unit -> no state change');
                         aCase.finished     = formatTime(time);
                         aCase.finishedTime = time;
                         break;
@@ -217,11 +216,11 @@ var processResource = function(resources) {
 io.on('connection', function(socket) {
     console.log('connecting:', socket.id);
     socket.on('queryCaseStatus', function() {
-        console.log("Called queryStatus", cases);
+        console.log('Called queryStatus', cases);
         socket.emit('caseStatus', cases);
     });
     socket.on('queryDiaryData', function() {
-        console.log("Called for DiaryData", diaryData);
+        console.log('Called for DiaryData', diaryData);
         socket.emit('diaryData', diaryData);
     });
 });
