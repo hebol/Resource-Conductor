@@ -271,7 +271,7 @@ var Unit = function(args) {
                     }
                     break;
                 case 'L':
-                    if (time.getTime() > that.atHospitalTime.getTime()) {
+                    if (that.atHospitalTime && time.getTime() > that.atHospitalTime.getTime()) {
                         that.atHospital();
                         result = that;
                     }
