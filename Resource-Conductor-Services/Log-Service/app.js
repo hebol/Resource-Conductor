@@ -124,6 +124,10 @@ var processResource = function(resources) {
     resources.forEach(function(resource) {
         if (resource.currentCase) {
             var aCase = cases[resource.currentCase.id];
+            if (!aCase) {
+                aCase = resource.currentCase;
+                cases[aCase.id] = aCase;
+            }
             var time  = Math.abs(currentTime - aCase.received);
 
             if (resourceStatusUpdated(resource)) {

@@ -193,9 +193,9 @@ $(document).ready(function() {
             mapResourceSocket = io.connect(service.url);
             mapResourceSocket.on('resourcesUpdated', function (data) {
                 data.forEach(function(resource) {
-                    if (resource.type === "S") {
+                    if (resource.type === 'S') {
                         createOrUpdateMarker(resource, resource.name, resource.area, "station", STATION_Z);
-                    } else if (resource.type === "A") {
+                    } else if (resource.type === 'A') {
                         createOrUpdateMarker(resource, resource.name + ' (' + resource.status + ')', resource.homeStation, "ambulance", AMBULANCE_Z);
                     }
                 });

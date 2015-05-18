@@ -9,6 +9,10 @@ function addUnit(unit) {
     return unitMap[unit.id] = unit;
 }
 
+var loadPatientDelay        = 10 * 60 * 1000,
+    hospitalLeaveDelay = 20 * 60 * 1000,
+    acknowledgeDelay   = 30 * 1000;
+
 function processRouteForId(id, route) {
     console.log("Received route for id", id, "==>", route);
     //console.log(JSON.stringify(route));
@@ -22,11 +26,11 @@ function processRouteForId(id, route) {
     } else {
         if (!unit.atSiteTime) {
             unit.atSiteTime = new Date(unit.acknowledgedTime.getTime() + steps[steps.length - 1].time * 1000);
-            unit.loadedTime = new Date(unit.atSiteTime.getTime() + 10 * 60 * 1000);
+            unit.loadedTime = new Date(unit.atSiteTime.getTime() + loadPatientDelay);
             unit.route.startTime = unit.acknowledgedTime;
         } else {
             unit.atHospitalTime = new Date(unit.loadedTime.getTime() + steps[steps.length - 1].time * 1000);
-            unit.readyAtHospitalTime = new Date(unit.atHospitalTime.getTime() + 20 * 60 * 1000);
+            unit.readyAtHospitalTime = new Date(unit.atHospitalTime.getTime() + hospitalLeaveDelay);
             unit.route.startTime = unit.loadedTime;
         }
     }
@@ -63,7 +67,7 @@ function moveUnitForTime(unit, time) {
                 }
             }
         } else {
-            console.log('Unit', unit.name, 'is out of time');
+            console.log('Unit', unit.name, 'is out of time (steps:', unit.route.steps.length, ')');
         }
     }
     return result;
@@ -175,29 +179,39 @@ var getHospitalLocationForCase = function(aCase) {
 };
 
 
+var copyPos = function (from, to) {
+    to.latitude  = from.latitude;
+    to.longitude = from.longitude;
+};
+
 var Unit = function(args) {
     var that    = this;
-    that.id     = -1;
-    that.type   = 'A';
-    that.status = 'K';
-    that.route  = {
-        startTime: null,
-        steps: null
-    };
-    that.assignedTime = null;
-    that.acknowledgedTime = null;
-    that.atSiteTime = null;
-    that.loadedTime = null;
-    that.atHospitalTime = null;
-    that.currentCase = null;
 
+    that.reset = function() {
+        that.type = 'A';
+        that.status = 'K';
+        that.route = {
+            startTime: null,
+            steps: null
+        };
+        that.assignedTime = null;
+        that.acknowledgedTime = null;
+        that.atSiteTime = null;
+        that.loadedTime = null;
+        that.atHospitalTime = null;
+        that.readyAtHospitalTime = null;
+        that.currentCase = null;
+    };
+
+    that.id     = -1;
     if (args.constructor === Array) {
         args.forEach(function(unit, index, list){
             list[index] = new Unit(unit);
         });
         return args;
     } else {
-        copyProperties(args, this);
+        that.reset();
+        copyProperties(args, that);
     }
 
     that.atSite = function() {
@@ -235,12 +249,69 @@ var Unit = function(args) {
         routeConsumer.emit('getRouteForId', that, getHospitalLocationForCase(that.currentCase), that.id);
     };
 
+    that.processLogs = function(logs, aCase) {
+        console.log('Will update', that.name, 'with', logs);
+        logs.sort(function(a,b) {return a.CreatedTime.localeCompare(b.CreatedTime);});
+        logs.forEach(function(aLog) {
+            var time = new Date(aLog.CreatedTime);
+            if (aLog.LogText.indexOf('knuten, status T')) {
+                that.assignedTime = time;
+                that.status = 'T';
+            }
+            if (aLog.LogText.indexOf('status U')) {
+                that.acknowledgedTime = time;
+                that.status = 'U';
+            }
+            if (aLog.LogText.indexOf('status F')) {
+                that.atSiteTime = time;
+                copyPos(aCase, that);
+                that.status = 'F';
+            }
+            if (aLog.LogText.indexOf('status L')) {
+                that.loadedTime = time;
+                copyPos(aCase, that);
+                that.status = 'L';
+            }
+            if (aLog.LogText.indexOf('status S')) {
+                that.atHospitalTime = time;
+                copyPos(getHospitalLocationForCase(aCase), that);
+                that.status = 'S';
+            }
+            if (aLog.LogText.indexOf('status H')) {
+                that.readyAtHospitalTime = time;
+                that.status = 'H';
+            }
+            if (aLog.LogText.indexOf('klar')) {
+                that.readyAtHospitalTime = time;
+                that.status = 'K';
+                copyPos(that.homeStationPos, that);
+            }
+            that.currentCase = aCase;
+            if (!that.readyAtHospitalTime && that.atHospitalTime) {
+                that.readyAtHospitalTime = new Date(that.atHospitalTime.getTime() + hospitalLeaveDelay);
+            }
+            if (!that.atHospitalTime && that.loadedTime) {
+                that.moveToHospital();
+            }
+            if (!that.loadedTime && that.atSiteTime) {
+                that.loadedTime = new Date(that.atSiteTime.getTime() + loadPatientDelay);
+            }
+            if (!that.atSiteTime && that.acknowledgedTime) {
+                that.moveToCase();
+            }
+            if (!that.acknowledgedTime && that.assignedTime) {
+                that.readyAtHospitalTime = new Date(that.atHospitalTime.getTime() + acknowledgeDelay);
+            }
+            console.log('Unit updated to state', that);
+        });
+    };
+
     that.assignCase = function(aCase, time) {
-        console.log('unit', that.name, 'asked to go to', aCase.id, 'at', time);
+        console.log('unit', that.name, 'asked to go to', aCase.CaseFolderId, 'at', time);
         addUnit(that);
         that.status = 'T';
         that.assignedTime = time;
-        that.acknowledgedTime = new Date(time.getTime() + 30 * 1000);
+        that.acknowledgedTime = new Date(time.getTime() + acknowledgeDelay);
         that.currentCase = aCase;
     };
 
