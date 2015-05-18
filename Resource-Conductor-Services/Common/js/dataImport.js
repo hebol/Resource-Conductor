@@ -32,7 +32,7 @@ var readDataForTime = function(time, callback) {
         readCase(time, function(cases) {
             result.cases = cases;
             readLog(time, function(log){
-                result.logs = log;
+                result.logs = log.filter(function(aLog){return Date.parse(aLog.CreatedTime) <= time.getTime();});
                 processReadData(time, result);
                 logReadResult(result, time);
                 callback && callback(result);

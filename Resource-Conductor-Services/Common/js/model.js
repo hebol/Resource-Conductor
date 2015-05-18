@@ -20,16 +20,20 @@ function processRouteForId(id, route) {
 
     var unit = getUnit(id);
     unit.route.steps = steps;
+    var routeDuration = steps && steps.length ? steps[steps.length - 1].time : 0;
+    if (routeDuration == 0) {
+        console.log('Error in route', route);
+    }
     if (unit.status == 'H') {
-            unit.atHomeStation = new Date(unit.readyAtHospitalTime.getTime() + steps[steps.length - 1].time * 1000);
+            unit.atHomeStation = new Date(unit.readyAtHospitalTime.getTime() + routeDuration * 1000);
             unit.route.startTime = unit.readyAtHospitalTime;
     } else {
         if (!unit.atSiteTime) {
-            unit.atSiteTime = new Date(unit.acknowledgedTime.getTime() + steps[steps.length - 1].time * 1000);
+            unit.atSiteTime = new Date(unit.acknowledgedTime.getTime() + routeDuration * 1000);
             unit.loadedTime = new Date(unit.atSiteTime.getTime() + loadPatientDelay);
             unit.route.startTime = unit.acknowledgedTime;
         } else {
-            unit.atHospitalTime = new Date(unit.loadedTime.getTime() + steps[steps.length - 1].time * 1000);
+            unit.atHospitalTime = new Date(unit.loadedTime.getTime() + routeDuration * 1000);
             unit.readyAtHospitalTime = new Date(unit.atHospitalTime.getTime() + hospitalLeaveDelay);
             unit.route.startTime = unit.loadedTime;
         }
@@ -67,7 +71,7 @@ function moveUnitForTime(unit, time) {
                 }
             }
         } else {
-            console.log('Unit', unit.name, 'is out of time (steps:', unit.route.steps.length, ')');
+            console.log('Unit', unit.name, 'is out of time (steps:', unit.route.steps.length, elapsedTime, 'start', unit.route.startTime, 'now', time, ')');
         }
     }
     return result;

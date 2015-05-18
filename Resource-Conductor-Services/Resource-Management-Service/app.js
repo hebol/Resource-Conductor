@@ -56,7 +56,7 @@ var updateUnitStatus = function (unitId, logs, aCase) {
     if (unit) {
         unit.processLogs(logs, aCase);
     } else {
-        console.log('Could not find unit with id', unitId, 'in list', units);
+        console.log('Could not find unit with id', unitId);
     }
 };
 
