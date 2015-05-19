@@ -12,7 +12,7 @@ function toList(aMap) {
 
 
 var clearResourceAndEventData = function() {
-    selectedCase = null;
+    selectedCaseId = null;
     selectedUnit = null;
     unitList     = {};
     eventList    = {};
@@ -20,7 +20,7 @@ var clearResourceAndEventData = function() {
     $units && $units.empty();
 };
 
-var selectedCase = null;
+var selectedCaseId = null;
 
 var clearSelectedUnits = function() {
     if (selectedUnit !== null) {
@@ -42,11 +42,11 @@ var createCaseListItem = function(myCase) {
     var $case = $('<div>', {class:'case'}).on("click",function() {
         panMapToObject(myCase);
         clearSelectedUnits();
-        if (selectedCase !== null) {
-            $("#event-"+selectedCase).toggleClass("selected-case");
+        if (selectedCaseId !== null) {
+            $("#event-"+selectedCaseId).toggleClass("selected-case");
         }
-        selectedCase = myCase.id;
-        $("#event-"+selectedCase).toggleClass("selected-case");
+        selectedCaseId = myCase.id;
+        $("#event-"+selectedCaseId).toggleClass("selected-case");
         setSelectedCase(myCase);
     });
 
@@ -73,9 +73,10 @@ var createCaseListItem = function(myCase) {
 
 var setSelectedCase = function (aCase) {
     $units.empty();
+    //console.log('Will look at the list of avialbel units', unitList);
     for (var unitId in unitList) {
         var unit = unitList[unitId];
-        $units.append(createUnitListItem(unit, aCase, shallWeHideUnit(aCase.id, unitId)));
+        $units.append(createUnitListItem(unit, aCase, shallWeHideUnit(aCase.id, unit.id)));
     }
 
     var listItems = $units.children('li').get();
@@ -107,7 +108,7 @@ var calculateDistance = function (aUnit, anEvent) {
 };
 
 var assignResourceToCase = function (aUnit, anEvent) {
-    eventSocket.emit('assignResourceToCase', aUnit.id, anEvent.id);
+    eventSocket.emit('assignResourceToCase', aUnit.name, anEvent.id);
 };
 
 var panMapToObject = function(obj, zoomLevel) {
@@ -198,15 +199,18 @@ var unitList = {};
 var shallWeHideUnit = function(caseId, unitId) {
     var aCase = eventList[caseId];
     var unit  = unitList[unitId];
+    var result = false;
     if (caseId) {
-        if (aCase.hasOwnProperty("resources")) {
-            return (aCase.resources.indexOf(parseInt(unitId)) === -1);
-        } else if (unit["status"] != "K") {
-            return true;
+        if (aCase.resources && aCase.resources.length > 0) {
+            result = (aCase.resources.indexOf(unit.name) == -1);
+        } else if (unit.status != 'K' && unit.status != 'H') {
+            result = true;
         }
     }
 
-    return false;
+    console.log('Shall we hide unit', unit.name, 'for', caseId, '=>', result);
+    console.log('case', aCase, 'unit', unit.name);
+    return result;
 };
 
 $(document).ready(function() {
@@ -226,15 +230,15 @@ $(document).ready(function() {
                 event.div = createCaseListItem(event);
                 if (oldEvent) {
                     $("#event-"+event.id).replaceWith(event.div);
-                    if (selectedCase === event.id) {
+                    if (selectedCaseId === event.id) {
                         $("#event-"+event.id).addClass("selected-case");
                     }
                 } else {
                     $events.append(event.div);
                 }
 
-                if (selectedCase != null) {
-                    setSelectedCase(eventList[selectedCase]);
+                if (selectedCaseId != null) {
+                    setSelectedCase(eventList[selectedCaseId]);
                 }
             });
         }
@@ -251,11 +255,12 @@ $(document).ready(function() {
                 var ambulances = resources.filter(function(resource) {return resource.type == 'A';});
                 console.log("Received", resources.length, "resources found", ambulances.length, "ambulances.");
                 ambulances.forEach(function(ambulance) {
-                    if (selectedCase != null) {
-                        var $unitDiv = createUnitListItem(ambulance, eventList[selectedCase], shallWeHideUnit(selectedCase, ambulance.id));
+                    if (selectedCaseId != null) {
+                        var $unitDiv = createUnitListItem(ambulance, eventList[selectedCaseId], shallWeHideUnit(selectedCaseId, ambulance.id));
                         $("#unit-"+ambulance.id).replaceWith($unitDiv);
                     }
 
+                    //console.log('registering resource', ambulance);
                     unitList[ambulance.id] = ambulance;
 
                     if (selectedUnit === ambulance.id && ambulance.status !== "A") {
