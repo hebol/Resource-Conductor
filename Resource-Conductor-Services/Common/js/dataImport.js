@@ -10,7 +10,11 @@ var processReadData = function (time, result) {
     result.cases.forEach(function(aCase){
         var mission = findMission(result.missions, aCase.CallCenterId, aCase.CaseFolderId, aCase.CaseId);
         mission && mergeToLast(aCase, mission);
-        !mission && console.log('Couldn\'t find mission for case', aCase);
+        if (!mission) {
+            aCase.MissionStarted = aCase.CreatedTime;
+            result.missions.push(aCase);
+            console.log('Couldn\'t find mission for case', aCase);
+        }
     });
     getStatus(time, result);
     result.cases = result.missions.filter(function(aCase) {return new Date(aCase.FinishedTime).getTime() >= time.getTime();});
