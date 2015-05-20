@@ -233,7 +233,7 @@ $(document).ready(function() {
                 if (event == null) {
                     return;
                 }
-                console.log('got event');
+                console.log('got event', event);
                 var oldEvent = eventList[event.id];
                 eventList[event.id] = event;
                 event.div = createCaseListItem(event);
@@ -255,9 +255,9 @@ $(document).ready(function() {
                     }
                 }
 
-                $events.children('li').get().sort(function(a, b) {
+                $('#eventList li').sort(function(a, b) {
                     return parseFloat($(a).attr('sortvalue')) - parseFloat($(b).attr('sortvalue'));
-                });
+                }).appendTo('#eventList');
 
 
                 if (selectedCaseId != null) {
