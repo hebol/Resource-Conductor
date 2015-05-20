@@ -2,6 +2,7 @@ var socket;
 var $speed;
 var setNewTime = function() {
     var value = $('#newTime').val();
+    localStorage.selectedTime = value;
     if (socket && value) {
         var date = new Date(value);
         console.log("Sending time", date, "to server, from", value);
@@ -65,6 +66,9 @@ $(document).ready(function() {
     $('#setTimeButton').click(setNewTime);
     $('#startButton').click(startTime);
     $('#stopButton').click(stopTime);
+    if (localStorage.selectedTime) {
+        $("#newTime").val(localStorage.selectedTime);
+    }
 
     $("#newTime").keyup(function(event){
         if(event.keyCode == 13) {
