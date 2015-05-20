@@ -16,10 +16,33 @@ require('../Common/js/serviceConsumer')('time-service', process.title,
     }, true
 );
 
+
+var findCase = function (caseId) {
+    for (var i = 0 ; i < eventList.length ; i++) {
+        if (eventList[i].id === caseId) {
+            return eventList[i];
+        }
+    }
+    console.log('Case', caseId, 'not found');
+    return null;
+};
+
+var processResources = function(updated) {
+    updated.forEach(function(unit){
+        console.log('Event updated: ', unit);
+        if (unit.status == 'K' || unit.status == 'H') {
+            var aCase = unit.currentCase && findCase(unit.currentCase.id);
+            aCase && (aCase.FinishedTime = lastTime);
+            io.sockets.emit('event', aCase);
+        }
+    });
+};
+
+
 var resourceConsumer =
 require('../Common/js/serviceConsumer')('resource-service', process.title,
     {
-        'updatedResources': processResources
+        'resourcesUpdated': processResources
     }, true
 );
 
@@ -97,25 +120,6 @@ function processTimeEvent(time, type) {
 
 config.registerService(port, 'event-service');
 
-var processResources = function(updated) {
-    updated.forEach(function(unit){
-        if (unit.status == 'K' || unit.status == 'H') {
-            var aCase = findCase(unit.currentCase.id);
-            aCase && (aCase.FinishedTime = lastTime);
-            io.sockets.emit('event', aCase);
-        }
-    });
-};
-
-var findCase = function (caseId) {
-    for (var i = 0 ; i < eventList.length ; i++) {
-        if (eventList[i].id === caseId) {
-            return eventList[i];
-        }
-    }
-    console.log('Case', caseId, 'not found');
-    return null;
-};
 
 var assignUnitToCaseById = function (unitId, caseId) {
     var aCase = findCase(caseId);

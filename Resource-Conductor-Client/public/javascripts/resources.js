@@ -34,7 +34,7 @@ var createCaseListItem = function(myCase) {
         return 'none';
     };
     var getSortValue = function (anEvent) {
-        return anEvent.prio + "." + (1 - ("0." + new Date(anEvent.time).getTime()));
+        return parseFloat(anEvent.prio) + parseFloat("0." + new Date(anEvent.time).getTime());
     };
 
     var id    = 'event-'+myCase.id;
@@ -215,7 +215,7 @@ var shallWeHideUnit = function(caseId, unitId) {
 
 $(document).ready(function() {
     $events = $('#eventList');
-    $units = $('#unitList');
+    $units  = $('#unitList');
 
     registerConsumer('event-service', function(service) {
         if (!eventSocket) {
@@ -229,13 +229,25 @@ $(document).ready(function() {
                 eventList[event.id] = event;
                 event.div = createCaseListItem(event);
                 if (oldEvent) {
-                    $("#event-"+event.id).replaceWith(event.div);
-                    if (selectedCaseId === event.id) {
-                        $("#event-"+event.id).addClass("selected-case");
+                    if (event.FinishedTime) {
+                        $("#event-"+event.id).remove();
+                        delete eventList[event.id];
+                    } else {
+                        $("#event-"+event.id).replaceWith(event.div);
+                        if (selectedCaseId === event.id) {
+                            $("#event-"+event.id).addClass("selected-case");
+                        }
                     }
                 } else {
-                    $events.append(event.div);
+                    if (!event.FinishedTime) {
+                        $events.append(event.div);
+                    }
                 }
+
+                $events.children('li').get().sort(function(a, b) {
+                    return parseFloat($(a).attr('sortvalue')) - parseFloat($(b).attr('sortvalue'));
+                });
+
 
                 if (selectedCaseId != null) {
                     setSelectedCase(eventList[selectedCaseId]);

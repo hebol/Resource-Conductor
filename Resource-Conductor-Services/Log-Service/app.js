@@ -126,6 +126,7 @@ var processResource = function(resources) {
             var aCase = cases[resource.currentCase.id];
             if (!aCase) {
                 aCase = resource.currentCase;
+                aCase.received = new Date(aCase.CreatedTime).getTime();
                 cases[aCase.id] = aCase;
             }
             var time  = Math.abs(currentTime - aCase.received);

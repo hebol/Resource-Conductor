@@ -87,7 +87,7 @@ var processTime = function(time, type) {
         units.forEach(function(unit) {
             unit.reset();
         });
-        setTimeout(function() { notifySubscribers(io.sockets, units);}, 500);
+        setTimeout(function() { notifySubscribers(io.sockets, stations); notifySubscribers(io.sockets, units);}, 500);
     } else {
         var updated = [];
         units.forEach(function(unit) {
