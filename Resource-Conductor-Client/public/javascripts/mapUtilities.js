@@ -53,6 +53,12 @@ var clearMapMarkers = function() {
     mapMarkers = {};
 };
 
+
+var removeMapMarker = function(object, type) {
+    var key = type + object.id;
+    mapMarkers[key] && mapMarkers[key].setMap(null);
+};
+
 //---------------------------------------------------------------------------
 // Add and cache a marker to the map. If a marker exists for the
 // "object.id + type" only move it to its new position.

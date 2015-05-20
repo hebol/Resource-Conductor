@@ -182,8 +182,13 @@ $(document).ready(function() {
             mapEventSocket = io.connect(service.url);
             mapEventSocket.on('event', function (data) {
                 if (data != null) {
-                    console.log('Will create marker for', data);
-                    createOrUpdateMarker(data,  data.index, data.address, "event", EVENT_Z);
+                    if (data.FinishedTime) {
+                        console.log('Will remove marker for finished event', data);
+                        removeMapMarker(data, "event");
+                    } else {
+                        console.log('Will create marker for', data);
+                        createOrUpdateMarker(data,  data.index, data.address, "event", EVENT_Z);
+                    }
                 }
             });
         }
