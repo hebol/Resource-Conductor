@@ -62,6 +62,7 @@ function moveUnitForTime(unit, time) {
 
                     unit.latitude = aStep.latitude;
                     unit.longitude = aStep.longitude;
+                    unit.distance = getDistanceFromPositionsInKm(unit, unit.targetPos);
                     result = unit;
                     if (i == unit.route.steps.length - 1) {
                         console.log('Vehicle', unit.name, 'moved to target location');
@@ -127,20 +128,25 @@ var index = [
     'Övrigt',
     'Helikopter 5920'];
 
-var getDistanceFromLatLonInKm = function(lat1,lon1,lat2,lon2) {
-    var deg2rad = function(deg) {
-        return deg * (Math.PI/180);
-    };
-    var R = 6371; // Radius of the earth in km
-    var dLat = deg2rad(lat2 - lat1);  // deg2rad below
-    var dLon = deg2rad(lon2 - lon1);
-    var a =
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-            Math.sin(dLon/2) * Math.sin(dLon/2)
-        ;
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c; // Distance in km
+var getDistanceFromPositionsInKm = function(pos1, pos2) {
+    var result = null;
+    if (pos1 && pos2) {
+        var deg2rad = function(deg) {
+            return deg * (Math.PI/180);
+        };
+        var R = 6371; // Radius of the earth in km
+        var dLat = deg2rad(pos2.latitude - pos1.latitude);  // deg2rad below
+        var dLon = deg2rad(pos2.longitude - pos1.longitude);
+        var a =
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(pos1.latitude)) * Math.cos(deg2rad(pos2.latitude)) *
+                Math.sin(dLon/2) * Math.sin(dLon/2)
+            ;
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        result = R * c; // Distance in km
+        result = Math.round(result * 100) / 100;
+    }
+    return result;
 };
 
 
@@ -164,7 +170,7 @@ var getHospitalLocationForCase = function(aCase) {
             } else {
                 var available = [sahlgrenska, molndal, ostra, kungalv, nal];
                 available.forEach(function(hospital) {
-                    var distance = getDistanceFromLatLonInKm(aCase.latitude, aCase.longitude, hospital.latitude, hospital.longitude);
+                    var distance = getDistanceFromPositionsInKm(aCase, hospital);
                     if (!selected || shortest > distance) {
                         selected = hospital;
                         shortest = distance;
@@ -179,7 +185,6 @@ var getHospitalLocationForCase = function(aCase) {
         console.log('The hospital was closest; it was', Math.round(shortest * 100) / 100, 'km away');
     }
 
-
     return selected;
 };
 
@@ -187,6 +192,9 @@ var getHospitalLocationForCase = function(aCase) {
 var copyPos = function (from, to) {
     to.latitude  = from.latitude;
     to.longitude = from.longitude;
+    console.log('copyPos(=>', to, ')');
+
+    return to;
 };
 
 var Unit = function(args) {
@@ -206,6 +214,7 @@ var Unit = function(args) {
         that.atHospitalTime = null;
         that.readyAtHospitalTime = null;
         that.currentCase = null;
+        that.targetPos = null;
     };
 
     that.id     = -1;
@@ -222,36 +231,45 @@ var Unit = function(args) {
     that.atSite = function() {
         that.status = 'F';
         that.route.steps = null;
+        that.targetPos = null;
     };
 
     that.atHome = function() {
         that.status = 'K';
         that.route.steps = null;
+        that.targetPos = null;
     };
 
     that.moveToCase = function() {
         that.route.steps = null;
         that.status = 'U';
+        that.targetPos = copyPos(that.currentCase, {});
         routeConsumer.emit('getRouteForId', that, that.currentCase, that.id);
     };
 
     that.moveToHomeStation = function() {
         that.route.steps = null;
         that.status = 'H';
+        that.targetPos = copyPos(that.homeStationPos, {});
         routeConsumer.emit('getRouteForId', that, that.homeStationPos, that.id);
     };
 
     that.atHospital = function() {
         that.status = 'S';
         that.route.steps = null;
+        that.targetPos = null;
     };
 
     that.moveToHospital = function() {
         that.route.startTime = that.loadedTime;
         that.route.steps = null;
         that.status = 'L';
+        var toPos = getHospitalLocationForCase(that.currentCase);
 
-        routeConsumer.emit('getRouteForId', that, getHospitalLocationForCase(that.currentCase), that.id);
+        that.targetPos = copyPos(toPos, {});
+        console.log('Will move to', that.targetPos);
+
+        routeConsumer.emit('getRouteForId', that, toPos, that.id);
     };
 
     that.processLogs = function(logs, aCase) {

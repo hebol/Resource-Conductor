@@ -89,25 +89,25 @@ var setSelectedCase = function (aCase) {
     }
 };
 
-function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
-    var deg2rad = function(deg) {
-        return deg * (Math.PI/180);
-    };
-    var R = 6371; // Radius of the earth in km
-    var dLat = deg2rad(lat2 - lat1);  // deg2rad below
-    var dLon = deg2rad(lon2 - lon1);
-    var a =
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-            Math.sin(dLon/2) * Math.sin(dLon/2)
-        ;
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c; // Distance in km
-}
-
-var calculateDistance = function (aUnit, anEvent) {
-    var distance = getDistanceFromLatLonInKm(aUnit.latitude, aUnit.longitude, anEvent.latitude, anEvent.longitude);
-    return Math.round(distance * 100) / 100;
+var getDistanceFromPositionsInKm = function(pos1, pos2) {
+    var result = "";
+    if (pos1 && pos2) {
+        var deg2rad = function(deg) {
+            return deg * (Math.PI/180);
+        };
+        var R = 6371; // Radius of the earth in km
+        var dLat = deg2rad(pos2.latitude - pos1.latitude);  // deg2rad below
+        var dLon = deg2rad(pos2.longitude - pos1.longitude);
+        var a =
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(pos1.latitude)) * Math.cos(deg2rad(pos2.latitude)) *
+                Math.sin(dLon/2) * Math.sin(dLon/2)
+            ;
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        result = R * c; // Distance in km
+        result = Math.round(result * 100) / 100;
+    }
+    return result;
 };
 
 var assignResourceToCase = function (aUnit, anEvent) {
@@ -127,7 +127,7 @@ var createUnitListItem = function(aUnit, anEvent, hide) {
         return 'none';
     };
 
-    var distance = calculateDistance(aUnit, anEvent);
+    var distance = aUnit.distance || getDistanceFromPositionsInKm(aUnit, anEvent);
     var $li       = $('<li>', {class:getStatusColor(), id:'unit-'+aUnit.id, distance: distance});
     var $unit = $('<div>', {class:'unit'}).on("click",function() {
         if (aUnit.status === "K") {
@@ -214,8 +214,8 @@ var shallWeHideUnit = function(caseId, unitId) {
         }
     }
 
-    console.log('Shall we hide unit', unit.name, 'for', caseId, '=>', result);
-    console.log('case', aCase, 'unit', unit.name);
+    //console.log('Shall we hide unit', unit.name, 'for', caseId, '=>', result);
+    //console.log('case', aCase, 'unit', unit.name);
     return result;
 };
 
