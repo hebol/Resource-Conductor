@@ -13,11 +13,13 @@ var processReadData = function (time, result) {
         if (!mission) {
             aCase.MissionStarted = aCase.CreatedTime;
             result.missions.push(aCase);
+            mission = aCase;
             console.log('Couldn\'t find mission for case', aCase);
         }
     });
     getStatus(time, result);
     result.cases = result.missions.filter(function(aCase) {return new Date(aCase.FinishedTime).getTime() >= time.getTime();});
+    result.cases.forEach(function(aCase){ aCase.FinishedTime = null;});
     delete result.missions;
 };
 
