@@ -359,7 +359,6 @@ var Unit = function(args) {
                     }
                     break;
                 case 'H':
-                    break;
                     if (time.getTime() > that.atHomeStation.getTime()) {
                         that.atHome();
                         result = that;
