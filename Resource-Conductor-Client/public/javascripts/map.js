@@ -181,8 +181,10 @@ $(document).ready(function() {
         if (mapEventSocket == null) {
             mapEventSocket = io.connect(service.url);
             mapEventSocket.on('event', function (data) {
-                console.log('Will create marker for', data);
-                createOrUpdateMarker(data,  data.index, data.address, "event", EVENT_Z);
+                if (data != null) {
+                    console.log('Will create marker for', data);
+                    createOrUpdateMarker(data,  data.index, data.address, "event", EVENT_Z);
+                }
             });
         }
     });

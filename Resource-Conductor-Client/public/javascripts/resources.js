@@ -134,10 +134,13 @@ var createUnitListItem = function(aUnit, anEvent, hide) {
             if (selectedUnit !== null) {
                 $("#unit-"+selectedUnit).toggleClass("selected-unit");
             }
+
             selectedUnit = aUnit.id;
             $("#unit-"+selectedUnit).toggleClass("selected-unit");
 
             assignResourceToCase(aUnit, anEvent);
+        } else {
+            panMapToObject(aUnit);
         }
     });
     var $nl1       = $('<br/>');
@@ -204,7 +207,6 @@ var shallWeHideUnit = function(caseId, unitId) {
     var unit  = unitList[unitId];
     var result = false;
     if (caseId) {
-        console.log("DA VASE: ", aCase);
         if (aCase.resources && aCase.resources.length > 0) {
             result = (aCase.resources.indexOf(unit.name) == -1);
         } else if (unit.status != 'K' && unit.status != 'H') {
@@ -228,6 +230,9 @@ $(document).ready(function() {
                 $events.empty();
             });
             eventSocket.on('event', function (event) {
+                if (event == null) {
+                    return;
+                }
                 console.log('got event');
                 var oldEvent = eventList[event.id];
                 eventList[event.id] = event;
