@@ -66,8 +66,10 @@ var processEvent = function(events) {
     } else {
         myEvents = events;
     }
-
     myEvents.forEach(function(event){
+        if (!event) {
+            return;
+        }
         var aCase;
         var time;
         if (cases.hasOwnProperty(event.id)) {

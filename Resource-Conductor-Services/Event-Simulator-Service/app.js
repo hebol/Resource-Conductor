@@ -29,7 +29,6 @@ var findCase = function (caseId) {
 
 var processResources = function(updated) {
     updated.forEach(function(unit){
-        console.log('Event updated: ', unit);
         if (unit.status == 'K' || unit.status == 'H') {
             var aCase = unit.currentCase && findCase(unit.currentCase.id);
             aCase && (aCase.FinishedTime = lastTime);

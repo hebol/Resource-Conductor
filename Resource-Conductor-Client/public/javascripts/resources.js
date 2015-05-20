@@ -74,16 +74,19 @@ var createCaseListItem = function(myCase) {
 var setSelectedCase = function (aCase) {
     $units.empty();
     //console.log('Will look at the list of avialbel units', unitList);
-    for (var unitId in unitList) {
-        var unit = unitList[unitId];
-        $units.append(createUnitListItem(unit, aCase, shallWeHideUnit(aCase.id, unit.id)));
-    }
 
-    var listItems = $units.children('li').get();
-    listItems.sort(function(a, b) {
-        return $(a).attr('distance') - $(b).attr('distance');
-    });
-    $.each(listItems, function(idx, itm) { $units.append(itm); });
+    if (aCase != null) {
+        for (var unitId in unitList) {
+            var unit = unitList[unitId];
+            $units.append(createUnitListItem(unit, aCase, shallWeHideUnit(aCase.id, unit.id)));
+        }
+
+        var listItems = $units.children('li').get();
+        listItems.sort(function(a, b) {
+            return $(a).attr('distance') - $(b).attr('distance');
+        });
+        $.each(listItems, function(idx, itm) { $units.append(itm); });
+    }
 };
 
 function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
@@ -201,6 +204,7 @@ var shallWeHideUnit = function(caseId, unitId) {
     var unit  = unitList[unitId];
     var result = false;
     if (caseId) {
+        console.log("DA VASE: ", aCase);
         if (aCase.resources && aCase.resources.length > 0) {
             result = (aCase.resources.indexOf(unit.name) == -1);
         } else if (unit.status != 'K' && unit.status != 'H') {
@@ -230,6 +234,8 @@ $(document).ready(function() {
                 event.div = createCaseListItem(event);
                 if (oldEvent) {
                     if (event.FinishedTime) {
+                        selectedCaseId = null;
+                        setSelectedCase(null);
                         $("#event-"+event.id).remove();
                         delete eventList[event.id];
                     } else {
