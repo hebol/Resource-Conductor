@@ -98,7 +98,13 @@ function processTimeEvent(time, type) {
 config.registerService(port, 'event-service');
 
 var processResources = function(updated) {
-    // ignore for now
+    updated.forEach(function(unit){
+        if (unit.status == 'K' || unit.status == 'H') {
+            var aCase = findCase(unit.currentCase.id);
+            aCase && (aCase.FinishedTime = lastTime);
+            io.sockets.emit('event', aCase);
+        }
+    });
 };
 
 var findCase = function (caseId) {
