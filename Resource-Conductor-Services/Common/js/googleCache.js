@@ -8,7 +8,7 @@ module.exports = function(dataDir) {
         },
 
         loadDataFile: function (filename, callback) {
-            console.log('loading data file', filename);
+            //console.log('loading data file', filename);
             fs.readFile(filename, 'utf8', function (err, data) {
                 if (err) {
                     throw err;
@@ -33,7 +33,11 @@ module.exports = function(dataDir) {
         },
         posToFilename: function (start, stop) {
             function toFilename(pos1, pos2) {
-                return dataDir + '/' + pos1.latitude + '_' + pos1.longitude + '_' + pos2.latitude + '_' + pos2.longitude + ".json";
+                var result = dataDir + '/' + pos1.latitude + '_' + pos1.longitude;
+                if (pos2) {
+                    result += '_' + pos2.latitude + '_' + pos2.longitude;
+                }
+                return result + ".json";
             }
 
             return toFilename(start, stop);

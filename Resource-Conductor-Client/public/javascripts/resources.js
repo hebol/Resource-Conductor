@@ -76,6 +76,7 @@ var setSelectedCase = function (aCase) {
     //console.log('Will look at the list of avialbel units', unitList);
 
     if (aCase != null) {
+        console.log('Selecting case', aCase);
         for (var unitId in unitList) {
             var unit = unitList[unitId];
             $units.append(createUnitListItem(unit, aCase, shallWeHideUnit(aCase.id, unit.id)));
@@ -243,10 +244,10 @@ $(document).ready(function() {
                     if (event.FinishedTime) {
                         selectedCaseId = null;
                         setSelectedCase(null);
-                        $("#event-"+event.id).remove();
+                        $("#event-" + event.id).remove();
                         delete eventList[event.id];
                     } else {
-                        $("#event-"+event.id).replaceWith(event.div);
+                        $("#event-" + event.id).replaceWith(event.div);
                         if (selectedCaseId === event.id) {
                             $("#event-"+event.id).addClass("selected-case");
                         }

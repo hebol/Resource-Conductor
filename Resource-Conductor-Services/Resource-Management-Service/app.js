@@ -19,8 +19,7 @@ var readData = function (filename, callback) {
         stations = data.stations;
         units    = model.Unit(data.units);
         calculateStartPositions(units, stations);
-        //console.log('converted', data.units, 'into', units);
-        console.log("Has read data file", filename, stations.length, "stations and", units.length, "ambulances");
+        console.log('Has read data file', filename, stations.length, 'stations and', units.length, 'ambulances');
         callback && callback( {stations: stations, units:units});
     });
 };
@@ -100,13 +99,10 @@ var processTime = function(time, type) {
     }
 };
 
-//var timeConsumer =
-    require('../Common/js/serviceConsumer')('time-service', process.title,
-    {
-        'time': processTime
-    },
-    true
-);
+require('../Common/js/serviceConsumer')('time-service', process.title,
+{
+    'time': processTime
+}, true);
 
 
 var notifySubscribers = function (sockets, resources) {

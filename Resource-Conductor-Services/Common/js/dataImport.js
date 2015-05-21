@@ -6,8 +6,8 @@ var moment = require('moment');
 //var dir = '/Users/martin/Dropbox/LSP/Hackaton/Hack_Case_2014-12-31/';
 var dir = '../data/';
 
-var processReadData = function (time, result) {
-    result.cases.forEach(function(aCase){
+var processReadData = function (time, result, validUnitNames) {
+    result.cases.forEach(function(aCase) {
         var mission = findMission(result.missions, aCase.CallCenterId, aCase.CaseFolderId, aCase.CaseId);
         mission && mergeToLast(aCase, mission);
         if (!mission) {
@@ -17,9 +17,10 @@ var processReadData = function (time, result) {
             console.log('Couldn\'t find mission for case', aCase);
         }
     });
-    getStatus(time, result);
-    result.cases = result.missions.filter(function(aCase) {return new Date(aCase.FinishedTime).getTime() >= time.getTime();});
+    getStatus(time, result, validUnitNames);
+    result.cases = result.missions.filter(function(aCase) {return new Date(aCase.FinishedTime).getTime() >= time.getTime() && parseInt(aCase.CasePriority) < 4;});
     result.cases.forEach(function(aCase){ aCase.FinishedTime = null;});
+    result.missions = null;
     delete result.missions;
 };
 
@@ -31,15 +32,15 @@ var logReadResult = function (result, time) {
     console.log('Has read', info, 'about', time);
 };
 
-var readDataForTime = function(time, callback) {
+var readDataForTime = function(time, validUnitNames, callback) {
     var result = {};
     readMissions(time, function(missions){
         result.missions = missions;
         readCase(time, function(cases) {
             result.cases = cases;
             readLog(time, function(log){
-                result.logs = log.filter(function(aLog){return Date.parse(aLog.CreatedTime) <= time.getTime();});
-                processReadData(time, result);
+                result.logs = log.filter(function(aLog){ return Date.parse(aLog.CreatedTime) <= time.getTime(); });
+                processReadData(time, result, validUnitNames);
                 logReadResult(result, time);
                 callback && callback(result);
             });
@@ -105,33 +106,6 @@ var mergeToLast = function (first, last) {
 
 var indexMap = {};
 
-//readCases(function(cases) {
-//    cases.forEach(function(aCase){
-//        indexMap[aCase.CaseIndex2Name] = aCase.CaseIndex2Name;
-//    });
-//    console.log('has read', cases.length, 'cases', Object.keys(indexMap));
-//});
-
-
-//readMissions(function(missions) {
-//    console.log('Has read', missions.length, 'missions');
-//    readCases( function(cases) {
-//        console.log('Has read', cases.length, 'cases');
-//        cases.forEach(function(aCase){
-//            var mission = findMission(missions, aCase.CallCenterId, aCase.CaseFolderId, aCase.CaseId);
-//            mission && mergeToLast(aCase, mission);
-//            !mission && missions.push(aCase);
-//        });
-//        //missions.forEach(function(mission) {console.log(mission);});
-//        console.log('Now', missions.length, 'missions');
-//        missionList = missions;
-//    });
-//});
-//
-//readLog(function(logs) {
-//    console.log('Has read', logs.length, 'logs');
-//});
-
 var getResourceIdFromLog = function (log) {
     var result = null;
     if (log.LogText.indexOf('Lastat') == 0 || log.LogText.indexOf('Larm mot') == 0 || log.LogText.indexOf('Framme') == 0) {
@@ -147,21 +121,22 @@ var getResourceIdFromLog = function (log) {
     return result;
 };
 
-var findLog = function (list, aMission, time) {
+var findLog = function (list, aMission, time, validUnitNames) {
     var result = null;
     list.forEach(function(log) {
        if (log.CaseFolderId == aMission.CaseFolderId && log.CallCenterId == aMission.CallCenterId) {
            if (Date.parse(log.CreatedTime) <= time.getTime()) {
-
                var resourceId = getResourceIdFromLog(log);
-               aMission.resources = aMission.resources || [];
-               if (aMission.resources.indexOf(resourceId) < 0) {
-                   aMission.resources.push(resourceId);
-                   console.log('Adding resource', resourceId, 'to mission', aMission.CaseFolderId);
-               }
+               if (validUnitNames[resourceId]) {
+                   aMission.resources = aMission.resources || [];
+                   if (aMission.resources.indexOf(resourceId) < 0) {
+                       aMission.resources.push(resourceId);
+                       console.log('Adding resource', resourceId, 'to mission', aMission.CaseFolderId);
+                   }
 
-               if (result == null || result.CreatedTime < log.CreatedTime) {
-                   result = log;
+                   if (result == null || result.CreatedTime < log.CreatedTime) {
+                       result = log;
+                   }
                }
            }
        }
@@ -169,13 +144,13 @@ var findLog = function (list, aMission, time) {
     return result;
 };
 
-var getStatus = function(time, data) {
+var getStatus = function(time, data, validUnitNames) {
     var active = [];
     data.missions.forEach(function(mission) {
         //console.log('looking at mission', mission);
         if (((new Date(mission.CreatedTime)).getTime() <= time.getTime()) &&
             (new Date(mission.FinishedTime).getTime() > time.getTime())) {
-            var log = findLog(data.logs, mission, time);
+            var log = findLog(data.logs, mission, time, validUnitNames);
             console.log('(', mission.CaseFolderId, ')', mission.CreatedTime, '<', time, '<', mission.FinishedTime, '=>', log && (log.LogText + ' (' + log.CreatedTime + ')'));
             active.push(mission);
         }

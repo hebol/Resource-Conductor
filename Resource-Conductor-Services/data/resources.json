@@ -72,15 +72,15 @@
       {"id":  36, "name":"354-9340","type" : "A", "homeStation":"Lysekil",   "status":"K"},
       {"id":  37, "name":"354-9350","type" : "A", "homeStation":"Sotenäs",   "status":"K"},
       {"id":  38, "name":"354-9510","type" : "A", "homeStation":"Åmål",      "status":"K"},
-      {"id":  39, "name":"354-95210","type" : "A", "homeStation":"Åmål",     "status":"K"},
+      {"id":  39, "name":"354-9520","type" : "A", "homeStation":"Åmål",     "status":"K"},
       {"id":  40, "name":"354-9430","type" : "A", "homeStation":"Mellerud",  "status":"K"},
       {"id":  41, "name":"354-9710","type" : "A", "homeStation":"Bengtsfors","status":"K"},
       {"id":  42, "name":"354-9730","type" : "A", "homeStation":"Dals Ed",   "status":"K"},
       {"id":  43, "name":"354-9610","type" : "A", "homeStation":"Strömstad", "status":"K"},
       {"id":  44, "name":"354-9620","type" : "A", "homeStation":"Strömstad", "status":"K"},
       {"id":  45, "name":"354-9640","type" : "A", "homeStation":"Tanumshede", "status":"K"},
-      {"id":  46, "name":"354-9640","type" : "A", "homeStation":"Lilla Edet RTJ","status":"K"},
-      {"id":  47, "name":"354-9640","type" : "A", "homeStation":"Mellerud RTJ","status":"K"}
+      {"id":  46, "name":"354-9920","type" : "A", "homeStation":"Lilla Edet RTJ","status":"K"},
+      {"id":  47, "name":"354-9970","type" : "A", "homeStation":"Mellerud RTJ","status":"K"}
     ],
   "unitSchedules":
   [ {"unit":"351-9120","days":"Mon,Tue,Wed,Thu,Fri,Sat,Sun","start":"07:00","end":"18:00","breakType":"R45","startBreak":"11:00","endBreak":"12:30"},
