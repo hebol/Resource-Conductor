@@ -98,9 +98,10 @@ var getCurrentCases = function(time) {
     if (time) {
         var timeLong = time.getTime();
         var result = caseList.filter(function(anEvent){ return !anEvent.FinishedTime && new Date(anEvent.MissionStarted).getTime() <= timeLong;});
-        console.log('current cases at', time, result.length);
+        console.log('Current cases at', time, result.length, 'of', caseList.length);
         return result;
     } else {
+        console.log('No time set, returning empty event list');
         return [];
     }
 };
@@ -219,7 +220,7 @@ var assignUnitToCaseById = function (unitId, caseId) {
 
 io.on('connection', function(socket) {
     console.log('connecting:', socket.id);
-    getCurrentCases().forEach(function(anEvent) {sendEvent(socket, anEvent, false);});
+    getCurrentCases(lastTime).forEach(function(anEvent) {sendEvent(socket, anEvent, false);});
     socket.on('assignResourceToCase', function(unitId, caseId) {
         assignUnitToCaseById(unitId, caseId);
     });

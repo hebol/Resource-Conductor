@@ -53,7 +53,7 @@ var createCaseListItem = function(myCase) {
     var $caseType = $('<div>', {class:'case-type',      text:myCase.prio});
     var $title    = $('<div>', {class:'title ellipsis', text:myCase.address});
     var $time1    = $('<div>', {class:'time-1',         text:dateUtil.getTime(new Date(myCase.time))});
-    var $time2    = $('<div>', {class:'time-2',         text:dateUtil.getTime(new Date(myCase.time2))});
+    var $time2    = $('<div>', {class:'time-2',         text:myCase.resources && myCase.resources.length});
     var $nl       = $('<br/>');
     var $desc     = $('<div>', {class:'desc',           text:myCase.index});
 
@@ -62,7 +62,7 @@ var createCaseListItem = function(myCase) {
     $case.append($time1);
     $case.append($nl);
     $case.append($desc);
-    if (myCase.time2 !== '') {
+    if (myCase.resources.length > 0) {
         $case.append($time2);
     }
 
@@ -228,7 +228,7 @@ $(document).ready(function() {
         if (!eventSocket) {
             eventSocket = io.connect(service.url);
             eventSocket.on('connect', function () {
-                console.log('Clearing event list');
+                console.log('Connected, clearing event list');
                 $events.empty();
             });
             eventSocket.on('event', function (event) {
@@ -258,9 +258,12 @@ $(document).ready(function() {
                     }
                 }
 
-                $('#eventList li').sort(function(a, b) {
-                    return parseFloat($(a).attr('sortvalue')) - parseFloat($(b).attr('sortvalue'));
-                }).appendTo('#eventList');
+                    // Only sort if new event
+                if (!oldEvent) {
+                    $('#eventList li').sort(function(a, b) {
+                        return parseFloat($(a).attr('sortvalue')) - parseFloat($(b).attr('sortvalue'));
+                    }).appendTo('#eventList');
+                }
 
 
                 if (selectedCaseId != null) {

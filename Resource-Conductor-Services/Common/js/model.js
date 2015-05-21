@@ -215,6 +215,7 @@ var Unit = function(args) {
         that.readyAtHospitalTime = null;
         that.currentCase = null;
         that.targetPos = null;
+        that.distance = null;
     };
 
     that.id     = -1;
@@ -240,6 +241,7 @@ var Unit = function(args) {
         copyPos(that.homeStationPos, that);
         that.route.steps = null;
         that.targetPos = null;
+        that.distance = null;
     };
 
     that.moveToCase = function() {

@@ -16,6 +16,7 @@ var processReadData = function (time, result, validUnitNames) {
             mission = aCase;
             console.log('Couldn\'t find mission for case', aCase);
         }
+        mission.resources = [];
     });
     getStatus(time, result, validUnitNames);
     result.cases = result.missions.filter(function(aCase) {return new Date(aCase.FinishedTime).getTime() >= time.getTime() && parseInt(aCase.CasePriority) < 4;});
@@ -128,7 +129,6 @@ var findLog = function (list, aMission, time, validUnitNames) {
            if (Date.parse(log.CreatedTime) <= time.getTime()) {
                var resourceId = getResourceIdFromLog(log);
                if (validUnitNames[resourceId]) {
-                   aMission.resources = aMission.resources || [];
                    if (aMission.resources.indexOf(resourceId) < 0) {
                        aMission.resources.push(resourceId);
                        console.log('Adding resource', resourceId, 'to mission', aMission.CaseFolderId);
