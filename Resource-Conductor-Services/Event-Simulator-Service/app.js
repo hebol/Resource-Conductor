@@ -50,7 +50,7 @@ var resourceNames = {};
 
 var processResources = function(updated) {
     updated.forEach(function(unit){
-        if (lastTime && (unit.status == 'K' || unit.status == 'H')) {
+        if (lastTime && lastTime.getTime() > 0 && (unit.status == 'K' || unit.status == 'H')) {
             var aCase = unit.currentCase && findCase(unit.currentCase.id, 'processResources');
             aCase && (aCase.FinishedTime = lastTime);
             aCase && io.sockets.emit('event', aCase);
