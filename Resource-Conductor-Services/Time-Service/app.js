@@ -20,7 +20,7 @@ io.on('connection', function(socket) {
     socket.on('setSpeed', setSpeedFunction);
     socket.on('querySpeed', function() {socket.emit('speed', speed)});
     socket.on('queryTimeMarks', function() {socket.emit('timeMarks', [{name: 'Start', timeStamp: '2015-05-23 12:00'}]);});
-    timeReference && socket.emit('time', timeReference, 'set');
+    timeReference && socket.emit('time', timeReference, 'tick');
 });
 
 var startTimeFunction = function() {

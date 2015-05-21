@@ -230,12 +230,14 @@ var Unit = function(args) {
 
     that.atSite = function() {
         that.status = 'F';
+        copyPos(that.currentCase, that);
         that.route.steps = null;
         that.targetPos = null;
     };
 
     that.atHome = function() {
         that.status = 'K';
+        copyPos(that.homeStationPos, that);
         that.route.steps = null;
         that.targetPos = null;
     };
@@ -256,6 +258,7 @@ var Unit = function(args) {
 
     that.atHospital = function() {
         that.status = 'S';
+        copyPos(that.targetPos, that);
         that.route.steps = null;
         that.targetPos = null;
     };

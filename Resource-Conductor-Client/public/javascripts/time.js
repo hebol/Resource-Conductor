@@ -54,7 +54,7 @@ $(document).ready(function() {
             $("#clock").html(dateUtil.getTime(date));
             $("#day").html(dateUtil.getDate(date));
             if (type == 'set') {
-                console.log("Trying to set value");
+                console.log("Setting new time", date);
                 $("#newTime").val(date.toJSON().slice(0, 19));
             }
         });

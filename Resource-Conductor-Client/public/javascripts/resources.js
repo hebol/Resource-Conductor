@@ -227,13 +227,15 @@ $(document).ready(function() {
         if (!eventSocket) {
             eventSocket = io.connect(service.url);
             eventSocket.on('connect', function () {
+                console.log('Clearing event list');
                 $events.empty();
             });
             eventSocket.on('event', function (event) {
                 if (event == null) {
+                    console.log('received empty event');
                     return;
                 }
-                console.log('got event', event);
+                console.log('Got event for list', event);
                 var oldEvent = eventList[event.id];
                 eventList[event.id] = event;
                 event.div = createCaseListItem(event);

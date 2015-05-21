@@ -5,7 +5,7 @@ var io          = require('socket.io')(),
     dataImport  = require('../Common/js/dataImport.js'),
     fs          = require('fs'),
     gm          = require('googlemaps'),
-    googleCache = require('../Common/js/googleCache.js')('routeDir');
+    googleCache = require('../Common/js/googleCache.js')('addressDir');
 
 var port = io.listen(0).httpServer.address().port;
 
@@ -74,7 +74,9 @@ function processEvents(target, fromTime, toTime) {
 var getCurrentCases = function(time) {
     if (time) {
         var timeLong = time.getTime();
-        return events.filter(function(anEvent){ return !anEvent.FinishedTime && new Date(anEvent.MissionStarted).getTime() <= timeLong;})
+        var result = eventList.filter(function(anEvent){ return !anEvent.FinishedTime && new Date(anEvent.MissionStarted).getTime() <= timeLong;})
+        console.log('current cases at', time, result.length);
+        return result;
     } else {
         return [];
     }

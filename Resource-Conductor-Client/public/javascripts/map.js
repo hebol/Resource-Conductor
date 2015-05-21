@@ -7,7 +7,7 @@ var mapTimeSocket,
 var updateReport = function() {
     if (mapLogSocket && !$('#report').is(":visible")) {
         $('#reportTable').dataTable().fnClearTable();
-        console.log('querying for reports', new Date());
+        console.log('Querying for reports', new Date());
         mapLogSocket.emit('queryCaseStatus');
     }
 };
@@ -141,7 +141,7 @@ $(document).ready(function() {
     };
 
     registerConsumer('log-service', function(service) {
-        console.log('will connect to log-service', service.url);
+        console.log('Will connect to log-service', service.url);
         if (mapLogSocket == null) {
             mapLogSocket = io.connect(service.url);
             mapLogSocket.on('caseStatus', function(cases) {
@@ -163,14 +163,14 @@ $(document).ready(function() {
             mapTimeSocket = io.connect(service.url);
             mapTimeSocket.on('time', function (data, type) {
                 var date = new Date(data);
-                $("#clock").html(dateUtil.getTime(date));
-                $("#day").html(dateUtil.getDate(date));
+                $('#clock').html(dateUtil.getTime(date));
+                $('#day').html(dateUtil.getDate(date));
                 if (type == 'set') {
-                    $("#newTime").val(date.toJSON().slice(0, 19));
+                    $('#newTime').val(date.toJSON().slice(0, 19));
                     clearResourceAndEventData();
                     clearMapMarkers();
                     $('#reportTable').dataTable().fnClearTable();
-                    $("#averageTable tbody").empty();
+                    $('#averageTable tbody').empty();
                 }
             });
         }
