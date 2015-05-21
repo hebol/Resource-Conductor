@@ -1,9 +1,11 @@
 process.title = 'event-system';
 
-var io         = require('socket.io')(),
-    config     = require('../Common/js/configService.js'),
-    dataImport = require('../Common/js/dataImport.js'),
-    fs         = require('fs');
+var io          = require('socket.io')(),
+    config      = require('../Common/js/configService.js'),
+    dataImport  = require('../Common/js/dataImport.js'),
+    fs          = require('fs'),
+    gm          = require('googlemaps'),
+    googleCache = require('../Common/js/googleCache.js')('routeDir');
 
 var port = io.listen(0).httpServer.address().port;
 
@@ -69,6 +71,15 @@ function processEvents(target, fromTime, toTime) {
     events.forEach(function(anEvent) {sendEvent(target, anEvent, true);});
 }
 
+var getCurrentCases = function(time) {
+    if (time) {
+        var timeLong = time.getTime();
+        return events.filter(function(anEvent){ return !anEvent.FinishedTime && new Date(anEvent.MissionStarted).getTime() <= timeLong;})
+    } else {
+        return [];
+    }
+};
+
 function handleSetTime(time) {
     dataImport().readDataForTime(time, function (data) {
         var result = {
@@ -119,7 +130,6 @@ function processTimeEvent(time, type) {
 
 config.registerService(port, 'event-service');
 
-
 var assignUnitToCaseById = function (unitId, caseId) {
     var aCase = findCase(caseId);
     if (aCase) {
@@ -139,19 +149,11 @@ var assignUnitToCaseById = function (unitId, caseId) {
 
 io.on('connection', function(socket) {
     console.log('connecting:', socket.id);
+    getCurrentCases().forEach(function(anEvent) {sendEvent(socket, anEvent, false);});
+
     lastTime && processEvents(socket, new Date(0), lastTime);
     socket.on('assignResourceToCase', function(unitId, caseId) {
         assignUnitToCaseById(unitId, caseId);
     });
 
 });
-
-var readEvents = function (filename) {
-    fs.readFile(filename, 'utf8', function (err, data) {
-        console.log('Has read data file', data);
-        if (err) throw err;
-        var data = JSON.parse(data);
-        eventList = data.eventList;
-        eventList.forEach(function(event){ event.time = new Date(event.time);});
-    });
-};

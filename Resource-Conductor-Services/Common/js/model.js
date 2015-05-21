@@ -1,4 +1,4 @@
-var routeHandling = require('./routeHandling.js');
+var googleCache = require('./googleCache.js')('routeDir');
 var unitMap = {};
 
 function getUnit(id) {
@@ -16,7 +16,7 @@ var loadPatientDelay        = 10 * 60 * 1000,
 function processRouteForId(id, route) {
     console.log("Received route for id", id, "==>", route);
     //console.log(JSON.stringify(route));
-    var steps = routeHandling.convertGoogleRoute(route.routes);
+    var steps = googleCache.convertGoogleRoute(route.routes);
 
     var unit = getUnit(id);
     unit.route.steps = steps;

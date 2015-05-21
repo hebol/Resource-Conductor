@@ -1,9 +1,9 @@
 process.title = 'route-system';
 
-var io = require('socket.io')(),
-    config = require('../Common/js/configService.js');
-var gm = require('googlemaps');
-var routeHandling = require('../Common/js/routeHandling.js');
+var io          = require('socket.io')(),
+    config      = require('../Common/js/configService.js');
+var gm          = require('googlemaps');
+var googleCache = require('../Common/js/googleCache.js')('routeDir');
 
 var port = io.listen(0).httpServer.address().port;
 
@@ -30,15 +30,15 @@ function toGooglePoint(point) {
 function calculateRoute(start, stop, callback) {
     var from = toGooglePoint(start);
     var to   = toGooglePoint(stop);
-    var filename = routeHandling.posToFilename(start, stop);
+    var filename = googleCache.posToFilename(start, stop);
 
-    routeHandling.dataFileExists(filename, function(exists){
+    googleCache.dataFileExists(filename, function(exists){
         if(exists) {
-            routeHandling.loadDataFile(filename, callback);
+            googleCache.loadDataFile(filename, callback);
         } else {
             gm.directions(from, to, function(err, route) {
                 console.log("Has received ROUTE from google", route, "(", err, ")");
-                routeHandling.writeDataFile(filename, route);
+                googleCache.writeDataFile(filename, route);
                 callback && callback(route);
             });
         }
