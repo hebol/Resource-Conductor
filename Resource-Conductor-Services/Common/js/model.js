@@ -349,8 +349,7 @@ var Unit = function(args) {
                 case 'K':
                     break;
                 case 'T':
-                    console.log('T =>', time, that.acknowledgedTime);
-                    if (time.getTime() > that.acknowledgedTime.getTime()) {
+                    if (that.acknowledgedTime && time.getTime() > that.acknowledgedTime.getTime()) {
                         that.moveToCase();
                         result = that;
                     }
@@ -362,7 +361,7 @@ var Unit = function(args) {
                     }
                     break;
                 case 'F':
-                    if (time.getTime() > that.loadedTime.getTime()) {
+                    if (that.loadedTime && time.getTime() > that.loadedTime.getTime()) {
                         that.moveToHospital();
                         result = that;
                     }
@@ -374,13 +373,13 @@ var Unit = function(args) {
                     }
                     break;
                 case 'S':
-                    if (time.getTime() > that.readyAtHospitalTime.getTime()) {
+                    if (that.readyAtHospitalTime && time.getTime() > that.readyAtHospitalTime.getTime()) {
                         that.moveToHomeStation();
                         result = that;
                     }
                     break;
                 case 'H':
-                    if (time.getTime() > that.atHomeStation.getTime()) {
+                    if (that.atHomeStation && time.getTime() > that.atHomeStation.getTime()) {
                         that.atHome();
                         result = that;
                     }
