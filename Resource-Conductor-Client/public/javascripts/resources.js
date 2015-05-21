@@ -242,7 +242,9 @@ $(document).ready(function() {
                 event.div = createCaseListItem(event);
                 if (oldEvent) {
                     if (event.FinishedTime) {
-                        selectedCaseId = null;
+                        if (selectedCaseId == event.id) {
+                            selectedCaseId = null;
+                        }
                         setSelectedCase(null);
                         $("#event-" + event.id).remove();
                         delete eventList[event.id];
