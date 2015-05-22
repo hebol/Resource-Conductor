@@ -204,15 +204,15 @@ config.registerService(port, 'event-service');
 var assignUnitToCaseById = function (unitId, caseId) {
     var aCase = findCase(caseId, 'assignUnitToCaseById');
     if (aCase) {
-        if (aCase.hasOwnProperty("resources")) {
-            if (aCase.resources.indexOf(unitId) != -1) {
+        if (aCase.resources) {
+            if (aCase.resources.indexOf(unitId) == -1) {
                 aCase.resources.push(unitId);
             }
         } else {
-            aCase["resources"] = [unitId];
+            aCase.resources = [unitId];
         }
 
-        console.log('Assigning', unitId, 'to', aCase);
+        console.log('Assigning', unitId, 'to', aCase.id);
         resourceConsumer.emit('assignResourceToCase', unitId, aCase);
         sendEvent(io.sockets, aCase, false);
     }
@@ -221,6 +221,7 @@ var assignUnitToCaseById = function (unitId, caseId) {
 io.on('connection', function(socket) {
     console.log('connecting:', socket.id);
     getCurrentCases(lastTime).forEach(function(anEvent) {sendEvent(socket, anEvent, false);});
+
     socket.on('assignResourceToCase', function(unitId, caseId) {
         assignUnitToCaseById(unitId, caseId);
     });

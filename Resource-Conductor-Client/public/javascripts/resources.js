@@ -131,13 +131,13 @@ var createUnitListItem = function(aUnit, anEvent, hide) {
     var distance = aUnit.distance || getDistanceFromPositionsInKm(aUnit, anEvent);
     var $li       = $('<li>', {class:getStatusColor(), id:'unit-'+aUnit.id, distance: distance});
     var $unit = $('<div>', {class:'unit'}).on("click",function() {
-        if (aUnit.status === "K") {
+        if (aUnit.status === 'K' || aUnit.status === 'H') {
             if (selectedUnit !== null) {
-                $("#unit-"+selectedUnit).toggleClass("selected-unit");
+                $("#unit-" + selectedUnit).toggleClass("selected-unit");
             }
 
             selectedUnit = aUnit.id;
-            $("#unit-"+selectedUnit).toggleClass("selected-unit");
+            $("#unit-" + selectedUnit).toggleClass("selected-unit");
 
             assignResourceToCase(aUnit, anEvent);
         } else {
