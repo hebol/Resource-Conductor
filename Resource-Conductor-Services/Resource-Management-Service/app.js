@@ -16,6 +16,16 @@ var readData = function (filename, callback) {
         if (err) { throw err;}
         data = JSON.parse(data);
 
+        data.unitSchedules.forEach(function(aSchedule){
+            var unit = getUnit(aSchedule.unit, data.units);
+            if (unit) {
+                aSchedule.days = aSchedule.days.split(',');
+                unit.schedule = aSchedule;
+            } else {
+                console.log('Could not find a unit for the schedule', aSchedule);
+            }
+        });
+
         stations = data.stations;
         units    = model.Unit(data.units);
         calculateStartPositions(units, stations);
@@ -28,10 +38,11 @@ readData('../data/resources.json', function() {
     config.registerService(port, "resource-service");
 });
 
-var getUnit = function (id) {
-    for (var i = 0; i < units.length; i++) {
-        if (units[i].name === id) {
-            return units[i];
+var getUnit = function (aName, aList) {
+    aList = aList || units;
+    for (var i = 0; i < aList.length; i++) {
+        if (aList[i].name === aName) {
+            return aList[i];
         }
     }
     return null;
