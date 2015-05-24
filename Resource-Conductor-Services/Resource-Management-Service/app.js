@@ -20,7 +20,10 @@ var readData = function (filename, callback) {
             var unit = getUnit(aSchedule.unit, data.units);
             if (unit) {
                 aSchedule.days = aSchedule.days.split(',');
-                unit.schedule = aSchedule;
+                if (!unit.schedule) {
+                    unit.schedule = [];
+                }
+                unit.schedule.push(aSchedule);
             } else {
                 console.log('Could not find a unit for the schedule', aSchedule);
             }
