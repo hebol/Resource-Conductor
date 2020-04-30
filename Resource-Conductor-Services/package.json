@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "csv-parse": "~0.1.0",
+    "csv-parse": "~4.9.0",
     "googlemaps": "^0.1.20",
     "iconv-lite": "^0.4.7",
     "moment": "^2.10.2",
